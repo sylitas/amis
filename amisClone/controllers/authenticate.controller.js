@@ -48,19 +48,21 @@ module.exports.postAuthenticate = (req,res)=>{
             }else{
                 ad.authenticate(username+domain, password, function(err, auth) {
                     if (auth) {
-                        var sql = "SELECT * FROM `user` WHERE accountName = ?";
+                        var sql = "CALL Proc_SelectUserInUser(?)";
                         conn.query(sql,[username],(err,rs)=>{
                             if(err) throw err;
+                            rs = rs[0];
                             if(rs.length>0){
                                 checkCookie(res,rs[0].userId);
                                 res.send("true");
                             }else{
-                                var sql = "INSERT INTO `user`(accountName) VALUES(?)";
+                                var sql = "CALL Proc_InsertUserFromLDAP(?)";
                                 conn.query(sql,[username],(err,rs)=>{
                                     if(err) throw err;
-                                    var sql = "SELECT userId FROM `user` WHERE accountName = ?";
+                                    var sql = "CALL Proc_SelectUserInUser(?)";
                                     conn.query(sql,[username],(err,rs)=>{
                                         if(err) throw err;
+                                        rs = rs[0];
                                         checkCookie(res,rs[0].userId);
                                     });
                                 });
