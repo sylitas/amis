@@ -11,10 +11,11 @@ MVC:
 //require modules
 var express = require('express');
 var bodyParser = require('body-parser');
+var cookieParser = require('cookie-parser');
 var pug = require('pug');
 //require routers
 var authenticateRouter = require("./routers/authenticate.router");
-
+var dashboardRouter = require("./routers/dashboard.router");
 
 var app = express();
 
@@ -27,9 +28,16 @@ app.set('view engine', 'pug');
 app.set("views","./views");
 //static file (css,jvs,scss,...)
 app.use(express.static('public'));
+//cookie perser config
+app.use(cookieParser('privatekey'));//change later
 
 app.use('/',authenticateRouter);
+app.use('/dashboard',dashboardRouter);
+app.use('/logout',(req,res)=>{
+    res.clearCookie("login");
+    res.redirect('/');
+});
 
 app.listen(port,()=>{
-    console.log("Successful on "+port);
+    console.log("Compile complete on "+port);
 });
