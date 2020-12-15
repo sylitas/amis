@@ -15,7 +15,8 @@ var cookieParser = require('cookie-parser');
 var pug = require('pug');
 //require routers
 var authenticateRouter = require("./routers/authenticate.router");
-var dashboardRouter = require("./routers/dashboard.router");
+var dashboardRouterForUser = require("./routers/dashboard-user.router");
+var dashboardRouterForAdmin = require("./routers/dashboard-admin.router");
 
 var app = express();
 
@@ -32,12 +33,12 @@ app.use(express.static('public'));
 app.use(cookieParser('privatekey'));//change later
 
 app.use('/',authenticateRouter);
-app.use('/dashboard',dashboardRouter);
+app.use('/dashboard',dashboardRouterForUser);
+app.use('/dashboardAdmin',dashboardRouterForAdmin);
 app.use('/logout',(req,res)=>{
+    res.clearCookie("admin");
     res.clearCookie("login");
     res.redirect('/');
 });
 
-app.listen(port,()=>{
-    console.log("Compile complete on "+port);
-});
+app.listen(port,()=>{console.log("Compile complete on "+port);});

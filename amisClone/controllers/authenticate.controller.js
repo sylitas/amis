@@ -18,70 +18,16 @@ var config = { url: 'ldap://192.168.100.10',
 
 var ad = new ActiveDirectory(config);
 
-module.exports.getAuthenticate = (req,res)=>{
-    if(!req.signedCookies.login){
-        res.render("login");
-    }else{
-        db.all("SELECT * FROM `cookies` WHERE cookie = ?",req.signedCookies.login,(err,rs)=>{
-            if(err) throw err;
-            if(rs.length>0){
-                res.redirect("/dashboard");
-            }else{
-                res.render("login");
-            }
-        });
-    }
-    
-};
-
-module.exports.postAuthenticate = (req,res)=>{
-    var username = req.body.username;
-    var password = req.body.password;
-    var sql = "SELECT * FROM `user` WHERE accountName = ? AND password = ?";
-    conn.query(sql,[md5(username),md5(password)],(err,rs)=>{
-        if(err){throw err}else{
-            //check user is local-user or ldap-user
-            if(rs.length>0){
-                checkCookie(res,rs[0].userId);
-                res.send('true');
-                //done
-            }else{
-                ad.authenticate(username+domain, password, function(err, auth) {
-                    if (auth) {
-                        var sql = "CALL Proc_SelectUserInUser(?)";
-                        conn.query(sql,[username],(err,rs)=>{
-                            if(err) throw err;
-                            rs = rs[0];
-                            if(rs.length>0){
-                                checkCookie(res,rs[0].userId);
-                                res.send("true");
-                            }else{
-                                var sql = "CALL Proc_InsertUserFromLDAP(?)";
-                                conn.query(sql,[username],(err,rs)=>{
-                                    if(err) throw err;
-                                    var sql = "CALL Proc_SelectUserInUser(?)";
-                                    conn.query(sql,[username],(err,rs)=>{
-                                        if(err) throw err;
-                                        rs = rs[0];
-                                        checkCookie(res,rs[0].userId);
-                                    });
-                                });
-                                res.send("true");
-                            }
-                        });
-                    }
-                    else {
-                        res.send("Invalid Data");
-                    }
-                });
-            }
-        }
-    });
-
-}
-
 function cookieCreater(res,token){
     res.cookie("login",token,{
+        httpOnly:true,
+        signed:true,
+        maxAge:4*1000*60*60
+    });
+}
+
+function cookieCreaterAdmin(res,token){
+    res.cookie("admin",token,{
         httpOnly:true,
         signed:true,
         maxAge:4*1000*60*60
@@ -111,5 +57,104 @@ function checkCookie(res,userId){
     db.all("SELECT * FROM `cookies` WHERE userId = ?",userId,(err,rs)=>{
         if(err) throw err;
         if(rs.length > 0){update(userId,token);}else{insert(userId,token);}
+    });
+}
+
+function checkCookieAdmin(res,userId){
+    //create JWT
+    var token = jwt.sign({
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 *4),
+        data: userId
+    }, privateKey);
+    //sending to user and storing inside cookie
+    cookieCreaterAdmin(res,token);
+    db.all("SELECT * FROM `cookies` WHERE userId = ?",userId,(err,rs)=>{
+        if(err) throw err;
+        if(rs.length > 0){update(userId,token);}else{insert(userId,token);}
+    });
+}
+
+function checkRole(res,userId,role){
+    if(role == "administrator"){
+        checkCookieAdmin(res,userId)
+        res.send('trueA');
+    }else{
+        checkCookie(res,userId);
+        res.send('trueU');
+    }
+}
+
+function setRole(userId){
+    var sql = "CALL Proc_InsertNewUserRole(?)";
+    conn.query(sql,[userId],(err,rs)=>{
+        if(err) throw err;
+    });
+}
+
+module.exports.getAuthenticate = (req,res)=>{
+    if(!req.signedCookies.login){
+        res.render("login");
+    }else{
+        db.all("SELECT * FROM `cookies` WHERE cookie = ?",req.signedCookies.login,(err,rs)=>{
+            if(err) throw err;
+            if(rs.length>0){
+                res.redirect("/dashboard");
+            }else{
+                res.render("login");
+            }
+        });
+    }
+    
+};
+
+module.exports.postAuthenticate = (req,res)=>{
+    var username = req.body.username;
+    var password = req.body.password;
+    var sql = "CALL Proc_SelectAccountForLogin(?,?)";
+    conn.query(sql,[md5(username),md5(password)],(err,rss)=>{
+        if(err){throw err}else{
+            rss = rss[0];
+            //check user is local-user or ldap-user
+            if(rss.length>0){
+                var sql = "CALL Proc_SelectRoleUser(?)";
+                conn.query(sql,[rss[0].userId],(err,rs)=>{
+                    if(err) throw err;
+                    checkRole(res,rss[0].userId,rs[0][0].userRoleName);
+                });
+            }else{
+                ad.authenticate(username+domain, password, function(err, auth) {
+                    if (auth) {
+                        var sql = "CALL Proc_SelectUserInUser(?)";
+                        conn.query(sql,[username],(err,rss)=>{
+                            if(err) throw err;
+                            rss = rss[0];
+                            if(rss.length>0){
+                                var sql = "CALL Proc_SelectRoleUser(?)";
+                                conn.query(sql,[rs[0].userId],(err,rs)=>{
+                                    if(err) throw err;
+                                    checkRole(res,rss[0].userId,rs[0][0].userRoleName);
+                                });
+                            }else{
+                                var sql = "CALL Proc_InsertUserFromLDAP(?)";
+                                conn.query(sql,[username],(err,rs)=>{
+                                    if(err) throw err;
+                                    var sql = "CALL Proc_SelectUserInUser(?)";
+                                    conn.query(sql,[username],(err,rss)=>{
+                                        if(err) throw err;
+                                        rss = rss[0];
+                                        setRole(rss[0].userId);
+                                        var sql = "CALL Proc_SelectRoleUser(?)";
+                                        conn.query(sql,[rs[0].userId],(err,rs)=>{
+                                            if(err) throw err;
+                                            checkRole(res,rss[0].userId,rs[0][0].userRoleName);
+                                        });
+                                    });
+                                });
+                            }
+                        });
+                    }else {res.send("Invalid Data");}
+                });
+            }
+        }
     });
 }

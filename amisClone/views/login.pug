@@ -32,8 +32,10 @@ head
                 "password":password
               }
             }).done(function(data){
-              if(data == "true"){
+              if(data == "trueU"){
                 window.location.href = "/dashboard";
+              }else if(data == "trueA"){
+                window.location.href = "/dashboardAdmin";
               }else{
                 alert(data);
               }
