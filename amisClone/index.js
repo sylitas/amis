@@ -14,9 +14,9 @@ var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var pug = require('pug');
 //require routers
-var authenticateRouter = require("./routers/authenticate.router");
-var dashboardRouterForUser = require("./routers/dashboard-user.router");
-var dashboardRouterForAdmin = require("./routers/dashboard-admin.router");
+var authenticateRouter = require("./models/routers/authenticate.router");
+var dashboardRouter = require("./models/routers/dashboard.router");
+var managementRouter = require("./models/routers/management.router");
 
 var app = express();
 
@@ -33,12 +33,16 @@ app.use(express.static('public'));
 app.use(cookieParser('privatekey'));//change later
 
 app.use('/',authenticateRouter);
-app.use('/dashboard',dashboardRouterForUser);
-app.use('/dashboardAdmin',dashboardRouterForAdmin);
+app.use('/dashboard',dashboardRouter);
+app.use('/management',managementRouter);
+
 app.use('/logout',(req,res)=>{
-    res.clearCookie("admin");
-    res.clearCookie("login");
+    res.clearCookie("auth_token");
     res.redirect('/');
 });
+
+// app.use(function(req, res){
+//     res.render('404');   
+// });
 
 app.listen(port,()=>{console.log("Compile complete on "+port);});

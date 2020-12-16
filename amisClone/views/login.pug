@@ -22,25 +22,25 @@ head
         e.preventDefault();
         var username = $("#username").val();
         var password = $("#password").val();
-        if(username){
-          if(password){
-            $.ajax({
-              url:"/",
-              method:"POST",
-              data:{
-                "username":username,
-                "password":password
-              }
-            }).done(function(data){
-              if(data == "trueU"){
-                window.location.href = "/dashboard";
-              }else if(data == "trueA"){
-                window.location.href = "/dashboardAdmin";
-              }else{
-                alert(data);
-              }
-            });
-          }
+        if(!username){
+          alert("Missing Username");
+        }else if(!password){
+          alert("Missing Password");
+        }else{
+          $.ajax({
+            url:"/",
+            method:"POST",
+            data:{
+              "username":username,
+              "password":password
+            }
+          }).done(function(data){
+            if(data == "true"){
+              window.location.href = "/dashboard";
+            }else{
+              alert(data);
+            }
+          });
         }
       })
     });

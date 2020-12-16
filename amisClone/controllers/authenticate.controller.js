@@ -18,143 +18,112 @@ var config = { url: 'ldap://192.168.100.10',
 
 var ad = new ActiveDirectory(config);
 
-function cookieCreater(res,token){
-    res.cookie("login",token,{
-        httpOnly:true,
-        signed:true,
-        maxAge:4*1000*60*60
-    });
-}
-
-function cookieCreaterAdmin(res,token){
-    res.cookie("admin",token,{
-        httpOnly:true,
-        signed:true,
-        maxAge:4*1000*60*60
-    });
-}
-
 function update(userId,cookie){
     db.run("UPDATE `cookies` SET cookie = ? WHERE userId = ?",[cookie,userId],(err,rs)=>{
         if(err) throw err;
     });
-}
+};
 
 function insert(userId,cookie){
     db.run("INSERT INTO `cookies`(userId,cookie) VALUES(?,?)",userId,cookie,(err,rs)=>{
         if(err) throw err;
     })
-}
+};
 
-function checkCookie(res,userId){
-    //create JWT
-    var token = jwt.sign({
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 *4),
-        data: userId
-    }, privateKey);
-    //sending to user and storing inside cookie
-    cookieCreater(res,token);
-    db.all("SELECT * FROM `cookies` WHERE userId = ?",userId,(err,rs)=>{
-        if(err) throw err;
-        if(rs.length > 0){update(userId,token);}else{insert(userId,token);}
-    });
-}
-
-function checkCookieAdmin(res,userId){
-    //create JWT
-    var token = jwt.sign({
-        exp: Math.floor(Date.now() / 1000) + (60 * 60 *4),
-        data: userId
-    }, privateKey);
-    //sending to user and storing inside cookie
-    cookieCreaterAdmin(res,token);
-    db.all("SELECT * FROM `cookies` WHERE userId = ?",userId,(err,rs)=>{
-        if(err) throw err;
-        if(rs.length > 0){update(userId,token);}else{insert(userId,token);}
-    });
-}
-
-function checkRole(res,userId,role){
-    if(role == "administrator"){
-        checkCookieAdmin(res,userId)
-        res.send('trueA');
-    }else{
-        checkCookie(res,userId);
-        res.send('trueU');
-    }
-}
-
-function setRole(userId){
+function func_roleForNewUser(userId){
     var sql = "CALL Proc_InsertNewUserRole(?)";
     conn.query(sql,[userId],(err,rs)=>{
         if(err) throw err;
     });
+};
+
+function func_token(res,userId,role){
+    //create JWT
+    var token = jwt.sign({
+        exp: Math.floor(Date.now() / 1000) + (60 * 60 *4),//lasting 4 hours
+        data: {
+            "userId" : userId,
+            "role" : role
+        }
+    }, privateKey);
+    //store inside cookie
+    res.cookie("auth_token",token,{
+        httpOnly:true,
+        signed:true,
+        maxAge:4*1000*60*60// lasting for 4 hours
+    });
+    //save cookie to database for checking
+    db.all("SELECT * FROM `cookies` WHERE userId = ?",userId,(err,rs)=>{
+        if(err) throw err;
+        if(rs.length > 0){update(userId,token);}else{insert(userId,token);}
+    });
+    //bye server bru!!!, im ready to go to client-side
+    res.send("true");
 }
 
 module.exports.getAuthenticate = (req,res)=>{
-    if(!req.signedCookies.login){
-        res.render("login");
-    }else{
-        db.all("SELECT * FROM `cookies` WHERE cookie = ?",req.signedCookies.login,(err,rs)=>{
+    if(req.signedCookies.auth_token){
+        db.all("SELECT * FROM `cookies` WHERE cookie = ?",req.signedCookies.auth_token,(err,rs)=>{
             if(err) throw err;
-            if(rs.length>0){
-                res.redirect("/dashboard");
-            }else{
-                res.render("login");
-            }
+            if(rs.length>0){res.redirect('/dashboard');}
         });
-    }
-    
+    }else{res.render("login");}
 };
 
 module.exports.postAuthenticate = (req,res)=>{
     var username = req.body.username;
     var password = req.body.password;
     var sql = "CALL Proc_SelectAccountForLogin(?,?)";
-    conn.query(sql,[md5(username),md5(password)],(err,rss)=>{
+    conn.query(sql,[username,md5(password)],(err,rs)=>{
         if(err){throw err}else{
-            rss = rss[0];
+            rs = rs[0];
             //check user is local-user or ldap-user
-            if(rss.length>0){
+            if(rs.length>0){
+                var userId = rs[0].userId;
                 var sql = "CALL Proc_SelectRoleUser(?)";
-                conn.query(sql,[rss[0].userId],(err,rs)=>{
+                conn.query(sql,[userId],(err,rs)=>{
                     if(err) throw err;
-                    checkRole(res,rss[0].userId,rs[0][0].userRoleName);
+                    var role = rs[0][0].userRoleName;
+                    func_token(res,userId,role);
                 });
             }else{
-                ad.authenticate(username+domain, password, function(err, auth) {
+                var name = username+domain;
+                ad.authenticate(name, password, function(err, auth) {
                     if (auth) {
                         var sql = "CALL Proc_SelectUserInUser(?)";
-                        conn.query(sql,[username],(err,rss)=>{
+                        conn.query(sql,[username],(err,rs)=>{
                             if(err) throw err;
-                            rss = rss[0];
-                            if(rss.length>0){
+                            rs = rs[0];
+                            var userId = rs[0].userId;
+                            if(rs.length>0){
                                 var sql = "CALL Proc_SelectRoleUser(?)";
-                                conn.query(sql,[rs[0].userId],(err,rs)=>{
+                                conn.query(sql,[userId],(err,rs)=>{
                                     if(err) throw err;
-                                    checkRole(res,rss[0].userId,rs[0][0].userRoleName);
+                                    var role = rs[0][0].userRoleName;
+                                    func_token(res,userId,role);
                                 });
                             }else{
                                 var sql = "CALL Proc_InsertUserFromLDAP(?)";
                                 conn.query(sql,[username],(err,rs)=>{
                                     if(err) throw err;
                                     var sql = "CALL Proc_SelectUserInUser(?)";
-                                    conn.query(sql,[username],(err,rss)=>{
+                                    conn.query(sql,[username],(err,rs)=>{
                                         if(err) throw err;
-                                        rss = rss[0];
-                                        setRole(rss[0].userId);
+                                        var userId = rs[0][0].userId;
+                                        func_roleForNewUser(userId);
                                         var sql = "CALL Proc_SelectRoleUser(?)";
-                                        conn.query(sql,[rs[0].userId],(err,rs)=>{
+                                        conn.query(sql,[userId],(err,rs)=>{
                                             if(err) throw err;
-                                            checkRole(res,rss[0].userId,rs[0][0].userRoleName);
+                                            var role = rs[0][0].userRoleName;
+                                            func_token(res,userId,role);
                                         });
                                     });
                                 });
                             }
                         });
-                    }else {res.send("Invalid Data");}
+                    }else {res.send("Wrong Username or Password");}
                 });
             }
         }
     });
-}
+};
