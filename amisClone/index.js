@@ -34,7 +34,7 @@ app.use(cookieParser('privatekey'));//change later
 
 app.use('/',authenticateRouter);
 app.use('/dashboard',dashboardRouter);
-app.use('/management',managementRouter);
+app.use('/management/role',managementRouter);
 
 app.use('/logout',(req,res)=>{
     res.clearCookie("auth_token");
