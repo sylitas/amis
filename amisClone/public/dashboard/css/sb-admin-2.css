@@ -5678,6 +5678,10 @@ a.close.disabled {
   display: flex;
   align-items: center;
   min-height: calc(100% - 1rem);
+  width: 450px;
+  left:50%;
+  position: absolute;
+  margin-left: -200px;
 }
 
 .modal-dialog-centered::before {

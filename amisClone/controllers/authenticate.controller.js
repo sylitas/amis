@@ -94,8 +94,8 @@ module.exports.postAuthenticate = (req,res)=>{
                         conn.query(sql,[username],(err,rs)=>{
                             if(err) throw err;
                             rs = rs[0];
-                            var userId = rs[0].userId;
                             if(rs.length>0){
+                                var userId = rs[0].userId;
                                 var sql = "CALL Proc_SelectRoleUser(?)";
                                 conn.query(sql,[userId],(err,rs)=>{
                                     if(err) throw err;

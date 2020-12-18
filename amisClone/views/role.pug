@@ -32,6 +32,14 @@ head
           "type": "POST",
           "url":"/management/role/postDataByAjax"
         },
+        "columns": [
+          {"data": "id"}, 
+          {"data": "name"},
+          {"data": "note"}
+        ],
+        "rowId": function(a) {
+          return a.id;
+        },
         "language": {
           searchPlaceholder: "Search Role"
         }
@@ -49,8 +57,25 @@ head
           "url":"/management/role/postUserInRoleByAjax"
         }
       });
+      $("#delete").click(function(){
+        var id = $(".table-primary").find("td:first-child").text();
+        var cf = confirm("Are you sure want to delete a role ?");
+        if(cf == true){
+          $.ajax({
+            method:"POST",
+            url:"/management/role/deleteRole",
+            data:{"id":id}
+          }).done(function(notif){
+            tableRole.ajax.reload();
+          });
+        }
+      });   
       $("#dataTable-Role").on('click','tr',function(){
-        var id = $(this).find("td:first").text();
+        var id = tableRole.row( this ).id();
+        //addclass
+        $(this).siblings().removeClass('table-primary');
+        $(this).addClass('table-primary');
+        //for reload table
         tableContained.destroy();
         tableContained.clear();
         tableContained = $('#dataTable-contained').DataTable({
@@ -67,6 +92,28 @@ head
               "id":id
             }
           }
+        });
+      });
+      $("#submitAddingRole").click(function(e){
+        e.preventDefault();
+        if(!$('input[name="role"]').val()){
+          alert("Invalid data !");
+          return; 
+        }
+        var role = $('input[name="role"]').val();
+        var note = $('textarea[name="note"]').val();
+        $.ajax({
+          method:"POST",
+          url:"/management/role/addNewRole",
+          data:{
+            "role":role,
+            "note":note
+          }
+        }).done(function(notif){
+          tableRole.ajax.reload();
+          $('input[name="role"]').val("");
+          $('textarea[name="note"]').val("");
+          $("#addRole").modal("hide");
         });
       });
     });
@@ -304,18 +351,18 @@ body#page-top
         .container-fluid#noPadding
           .card#card1
             .card-header
-              h4.m-0.font-weight-bold.text-primary Role's members
+              h4.mt-0.font-weight-bold.text-primary Roles
               .row
                 .col-12#paddingTop
-                  a.btn.btn-light.btn-icon-split(href="#")
+                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#addRole')
                     span.icon.text-gray-600
                       i.fas.fa-plus
                     span.text Add Role
-                  a.btn.btn-light.btn-icon-split(href="#")
+                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#edit')
                     span.icon.text-gray-600
                       i.fas.fa-edit
                     span.text Edit
-                  a.btn.btn-light.btn-icon-split(href="#")
+                  a#delete.btn.btn-light.btn-icon-split(href="#")
                     span.icon.text-gray-600
                       i.fas.fa-trash
                     span.text Delete
@@ -323,6 +370,16 @@ body#page-top
                     span.icon.text-gray-600
                       i.fas.fa-sync
                     span.text Reload
+                  span.text |   
+                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#detail')
+                    span.icon.text-gray-600
+                      i.fas.fa-network-wired
+                    span.text Role
+                  span.text | 
+                  a.btn.btn-light.btn-icon-split(href="#")
+                    span.icon.text-gray-600
+                      i.fas.fa-file-export
+                    span.text Export
             .card-body.card-body-1
               .table-responsive
                 table#dataTable-Role.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
@@ -345,8 +402,75 @@ body#page-top
                       th Title
                       th Work At
                       th Description
+  #addRole.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
+    .modal-dialog-centered(role='document')
+      .modal-content
+        .modal-header
+          h5#exampleModalLabel.modal-title Add a new role
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+        .modal-body
+          form#addingRole()
+            .row
+              .col-4
+                p Role (<b style="color:red">*</b>)
+              .col-8
+                .input-group
+                  input(name="role" type="text" style={width:"100%"} placeholder="Role's name")
+            .row
+              .col-4
+                p Description
+              .col-8
+                .input-group
+                  textarea(name="note", cols="30", rows="7" placeholder="Note")
+        .modal-footer
+          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          button#submitAddingRole.btn.btn-primary(type="submit" form="addingRole") Save
       // End of Footer
     // End of Content Wrapper
+  #edit.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
+    .modal-dialog-centered(role='document')
+      .modal-content
+        .modal-header
+          h5#exampleModalLabel.modal-title Add a new role
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+        .modal-body
+          form()
+            .row
+              .col-4
+                p Code (<b style="color:red">*</b>)
+              .col-8
+                .input-group
+                  input(type="text" style={width:"100%"} placeholder="Role's code")
+            .row
+              .col-4
+                p Role (<b style="color:red">*</b>)
+              .col-8
+                .input-group
+                  input(type="text" style={width:"100%"} placeholder="Role's name")
+            .row
+              .col-4
+                p Description
+              .col-8
+                .input-group
+                  textarea(name="note", cols="30", rows="7" placeholder="Note")
+                  a.btn.btn-primary(href='#') Save
+        .modal-footer
+          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+  #detail.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
+    .modal-dialog-centered(role='document')
+      .modal-content
+        .modal-header
+          h5#exampleModalLabel.modal-title Add a new role
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+        .modal-body
+          
+        .modal-footer
+          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          a.btn.btn-primary(href='#') Save
+  //detail do later
   // End of Page Wrapper
   // Scroll to Top Button
   a.scroll-to-top.rounded(href='#page-top')
@@ -362,9 +486,8 @@ body#page-top
         .modal-body Select &quot;Logout&quot; below if you are ready to end your current session.
         .modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          a.btn.btn-primary(href='login.html') Logout
+          a.btn.btn-primary(href='/logout') Logout
   // Bootstrap core JavaScript
-  
   script(src='http://localhost:3000/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js')
   // Core plugin JavaScript
   script(src='http://localhost:3000/dashboard/vendor/jquery-easing/jquery.easing.min.js')

@@ -9,4 +9,6 @@ var router = express.Router();
 router.get('/',controller.getRole);
 router.post('/postDataByAjax',controller.postRole);
 router.post('/postUserInRoleByAjax',controller.postUserInRole);
+router.post('/addNewRole',controller.postAddNewRole);
+router.post('/deleteRole',controller.postDeleteRole);
 module.exports = router;

@@ -19,7 +19,6 @@ var dashboardRouter = require("./models/routers/dashboard.router");
 var managementRouter = require("./models/routers/management.router");
 
 var app = express();
-
 var port = 3000;
 //body-parser config
 app.use(bodyParser.json());
@@ -35,7 +34,6 @@ app.use(cookieParser('privatekey'));//change later
 app.use('/',authenticateRouter);
 app.use('/dashboard',dashboardRouter);
 app.use('/management/role',managementRouter);
-
 app.use('/logout',(req,res)=>{
     res.clearCookie("auth_token");
     res.redirect('/');

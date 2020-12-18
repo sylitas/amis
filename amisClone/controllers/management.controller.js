@@ -1,12 +1,10 @@
 var conn = require("../database/main.database");
 
 module.exports.getRole = (req,res)=>{
-    
     res.render("role");
 };
 
 module.exports.postRole = (req,res)=>{
-    var data = [];
     var dataList = [];
     var draw = req.body.draw;
     var recordsTotal; 
@@ -28,9 +26,13 @@ module.exports.postRole = (req,res)=>{
                 var id = rs[i].userRoleId;
                 var name = rs[i].userRoleName;
                 var note = rs[i].userRoleNote;
-                data = [id,name,note];
-                var arr_data = func_validate(data);
-                dataList.push(arr_data);
+                if(!note){note = null;}
+                var data = {
+                    "id":id,
+                    "name":name,
+                    "note":note
+                };
+                dataList.push(data);
             }
             var dataSend = {
                 "draw":draw,
@@ -62,7 +64,7 @@ module.exports.postUserInRole = (req,res)=>{
             var title = rs[i].title;
             var workplace = rs[i].workplace;
             var note = rs[i].userNote;
-            data = [id,name,fullname,title,workplace,note];
+            var data = [id,name,fullname,title,workplace,note];
             var arr_data = func_validate(data);
             dataList.push(arr_data);
         }
@@ -75,7 +77,31 @@ module.exports.postUserInRole = (req,res)=>{
             res.send(dataSend);
         });
 };
-
+module.exports.postAddNewRole = (req,res)=>{
+    if(!req.body.role){
+        res.send("Invalid Data!");
+    }else{
+        var role = req.body.role;
+        if(req.body.note){var note = req.body.note;}else{var note = null;}
+        var sql = "INSERT INTO `userRole`(userRoleName,userRoleNote) VALUES(?,?)";
+        conn.query(sql,[role,note],(err,rs)=>{
+            if(err)throw err;
+            res.send("Added!");
+        });
+    }
+};
+module.exports.postDeleteRole = (req,res)=>{
+    if(!req.body.id){
+        res.send("Invalid Data");
+    }else{
+        var id = req.body.id;
+        var sql = "DELETE FROM `userRole` WHERE userRoleId = ?";
+        conn.query(sql,[id],(err,rs)=>{
+            if(err)throw err;
+            res.send("Deleted!");
+        });
+    }
+};
 function func_validate(data){
     for(var i=0;i<data.length;i++){
         if(data[i] == null){data[i] = "";}
