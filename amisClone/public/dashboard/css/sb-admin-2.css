@@ -11246,3 +11246,23 @@ footer.sticky-footer .copyright {
 body.sidebar-toggled footer.sticky-footer {
   width: 100%;
 }
+/*addition*/
+.card-footer{padding-right:0;padding-left:0;}
+h4{padding-top:10px;}
+#paddingTop{padding-top:10px;}
+thead,tbody{background-color:#FFFFFF;}
+.card{border:none;}
+.card-header{border:none;padding:0;}
+.card-body{padding:0}
+.card-body-1{padding-bottom:0;background-color:#f8f9fc;}
+.card-body-2{padding-top:0;padding-bottom:0;background-color:#f8f9fc;}
+body{overflow:hidden;}
+.dataTables_scrollHeadInner, .table{width:100%!important;};
+#noPadding{padding:0;height:100vh;}
+#card1{height:70%;}
+#card2{height:30%;}
+#card3{height:auto;}
+::-webkit-scrollbar {width: 0;background: transparent;}
+#card1 table td{cursor:pointer;}
+#widther{width: 800px;margin-left:-350px;}
+#rmpadding{padding:0;}

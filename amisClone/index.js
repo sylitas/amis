@@ -19,7 +19,7 @@ var dashboardRouter = require("./models/routers/dashboard.router");
 var managementRouter = require("./models/routers/management.router");
 
 var app = express();
-var port = 3000;
+var port = 1999;
 //body-parser config
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

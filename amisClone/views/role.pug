@@ -7,139 +7,25 @@ head
   meta(name='author' content='')
   title Role
   // Custom fonts for this template
-  script(src='http://localhost:3000/dashboard/vendor/jquery/jquery.min.js')
-  link(href='http://localhost:3000/dashboard/vendor/fontawesome-free/css/all.min.css' rel='stylesheet' type='text/css')
+  script(src='http://localhost:1999/dashboard/vendor/jquery/jquery.min.js')
+  link(href='http://localhost:1999/dashboard/vendor/fontawesome-free/css/all.min.css' rel='stylesheet' type='text/css')
   link(href='https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i' rel='stylesheet')
   // Custom styles for this template
-  link(href='http://localhost:3000/dashboard/css/sb-admin-2.css' rel='stylesheet')
+  link(href='http://localhost:1999/dashboard/css/sb-admin-2.css' rel='stylesheet')
   // Custom styles for this page
-  link(href='http://localhost:3000/dashboard/vendor/datatables/dataTables.bootstrap4.min.css' rel='stylesheet')
+  link(href='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.css' rel='stylesheet')
   link(href='https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css' rel='stylesheet' type='text/css')
   // Page level plugins
-  script(src='http://localhost:3000/dashboard/vendor/datatables/jquery.dataTables.min.js')
-  script(src='http://localhost:3000/dashboard/vendor/datatables/dataTables.bootstrap4.min.js')
-  script.
-    $(document).ready(function() {
-      var tableRole = $('#dataTable-Role').DataTable({
-        "scrollY":"35vh",
-        "paging":   false,
-        "ordering": false,
-        "info":     false,
-        "filter":false,
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-          "type": "POST",
-          "url":"/management/role/postDataByAjax"
-        },
-        "columns": [
-          {"data": "id"}, 
-          {"data": "name"},
-          {"data": "note"}
-        ],
-        "rowId": function(a) {
-          return a.id;
-        },
-        "language": {
-          searchPlaceholder: "Search Role"
-        }
-      });
-      var tableContained = $('#dataTable-contained').DataTable({
-        "scrollY":"20vh",
-        "paging":   false,
-        "ordering": false,
-        "info":     false,
-        "filter": false,
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-          "type": "POST",
-          "url":"/management/role/postUserInRoleByAjax"
-        }
-      });
-      $("#delete").click(function(){
-        var id = $(".table-primary").find("td:first-child").text();
-        var cf = confirm("Are you sure want to delete a role ?");
-        if(cf == true){
-          $.ajax({
-            method:"POST",
-            url:"/management/role/deleteRole",
-            data:{"id":id}
-          }).done(function(notif){
-            tableRole.ajax.reload();
-          });
-        }
-      });   
-      $("#dataTable-Role").on('click','tr',function(){
-        var id = tableRole.row( this ).id();
-        //addclass
-        $(this).siblings().removeClass('table-primary');
-        $(this).addClass('table-primary');
-        //for reload table
-        tableContained.destroy();
-        tableContained.clear();
-        tableContained = $('#dataTable-contained').DataTable({
-          "scrollY":"20vh",
-          "paging":   false,
-          "ordering": false,
-          "info":     false,
-          "filter": false,
-          "serverSide": true,
-          "ajax": {
-            "type": "POST",
-            "url":"/management/role/postUserInRoleByAjax",
-            "data":{
-              "id":id
-            }
-          }
-        });
-      });
-      $("#submitAddingRole").click(function(e){
-        e.preventDefault();
-        if(!$('input[name="role"]').val()){
-          alert("Invalid data !");
-          return; 
-        }
-        var role = $('input[name="role"]').val();
-        var note = $('textarea[name="note"]').val();
-        $.ajax({
-          method:"POST",
-          url:"/management/role/addNewRole",
-          data:{
-            "role":role,
-            "note":note
-          }
-        }).done(function(notif){
-          tableRole.ajax.reload();
-          $('input[name="role"]').val("");
-          $('textarea[name="note"]').val("");
-          $("#addRole").modal("hide");
-        });
-      });
-    });
-  style(type="text/css").
-    h4{padding-top:10px;}
-    #paddingTop{padding-top:10px;}
-    thead,tbody{background-color:#FFFFFF;}
-    .card{border:none;}
-    .card-header{border:none;padding:0;}
-    .card-body{padding:0}
-    .card-body-1{padding-bottom:0;background-color:#f8f9fc;}
-    .card-body-2{padding-top:0;padding-bottom:0;background-color:#f8f9fc;}
-    body{overflow:hidden;}
-    .dataTables_scrollHeadInner, .table{width:100%!important;};
-    #noPadding{padding:0;height:100vh;}
-    #card1{height:70%;}
-    #card2{height:30%;}
-    ::-webkit-scrollbar {width: 0;background: transparent;}
-    #card1 table td{cursor:pointer;}
+  script(src='http://localhost:1999/dashboard/vendor/datatables/jquery.dataTables.min.js')
+  script(src='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.js')
+  script(src='http://localhost:1999/management/role.js')
 body#page-top
   // Page Wrapper
   #wrapper
     // Sidebar
     ul#accordionSidebar.navbar-nav.bg-gradient-primary.sidebar.sidebar-dark.accordion
       // Sidebar - Brand
-      a.sidebar-brand.d-flex.align-items-center.justify-content-center(href='index.html')
+      a.sidebar-brand.d-flex.align-items-center.justify-content-center(href='#')
         .sidebar-brand-icon.rotate-n-15
           i.fas.fa-laugh-wink
         .sidebar-brand-text.mx-3
@@ -290,7 +176,7 @@ body#page-top
                   | Message Center
                 a.dropdown-item.d-flex.align-items-center(href='#')
                   .dropdown-list-image.mr-3
-                    img.rounded-circle(src='http://localhost:3000/dashboard/img/undraw_profile_1.svg' alt='')
+                    img.rounded-circle(src='http://localhost:1999/dashboard/img/undraw_profile_1.svg' alt='')
                     .status-indicator.bg-success
                   .font-weight-bold
                     .text-truncate
@@ -299,7 +185,7 @@ body#page-top
                     .small.text-gray-500 Emily Fowler &middot; 58m
                 a.dropdown-item.d-flex.align-items-center(href='#')
                   .dropdown-list-image.mr-3
-                    img.rounded-circle(src='http://localhost:3000/dashboard/img/undraw_profile_2.svg' alt='')
+                    img.rounded-circle(src='http://localhost:1999/dashboard/img/undraw_profile_2.svg' alt='')
                     .status-indicator
                   div
                     .text-truncate
@@ -308,7 +194,7 @@ body#page-top
                     .small.text-gray-500 Jae Chun &middot; 1d
                 a.dropdown-item.d-flex.align-items-center(href='#')
                   .dropdown-list-image.mr-3
-                    img.rounded-circle(src='http://localhost:3000/dashboard/img/undraw_profile_3.svg' alt='')
+                    img.rounded-circle(src='http://localhost:1999/dashboard/img/undraw_profile_3.svg' alt='')
                     .status-indicator.bg-warning
                   div
                     .text-truncate
@@ -330,7 +216,7 @@ body#page-top
             li.nav-item.dropdown.no-arrow
               a#userDropdown.nav-link.dropdown-toggle(href='#' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')
                 span.mr-2.d-none.d-lg-inline.text-gray-600.small Douglas McGee
-                img.img-profile.rounded-circle(src='http://localhost:3000/dashboard/img/undraw_profile.svg')
+                img.img-profile.rounded-circle(src='http://localhost:1999/dashboard/img/undraw_profile.svg')
               // Dropdown - User Information
               .dropdown-menu.dropdown-menu-right.shadow.animated--grow-in(aria-labelledby='userDropdown')
                 a.dropdown-item(href='#')
@@ -357,8 +243,8 @@ body#page-top
                   a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#addRole')
                     span.icon.text-gray-600
                       i.fas.fa-plus
-                    span.text Add Role
-                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#edit')
+                    span.text Create Role
+                  a#edit.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#editer')
                     span.icon.text-gray-600
                       i.fas.fa-edit
                     span.text Edit
@@ -366,17 +252,17 @@ body#page-top
                     span.icon.text-gray-600
                       i.fas.fa-trash
                     span.text Delete
-                  a.btn.btn-light.btn-icon-split(href="#")
+                  a#reload.btn.btn-light.btn-icon-split(href="#")
                     span.icon.text-gray-600
                       i.fas.fa-sync
                     span.text Reload
                   span.text |   
-                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#detail')
+                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#grant')
                     span.icon.text-gray-600
                       i.fas.fa-network-wired
-                    span.text Role
+                    span.text Grant Permision
                   span.text | 
-                  a.btn.btn-light.btn-icon-split(href="#")
+                  a#export.btn.btn-light.btn-icon-split(href="#")
                     span.icon.text-gray-600
                       i.fas.fa-file-export
                     span.text Export
@@ -396,17 +282,29 @@ body#page-top
                 table#dataTable-contained.table.table-bordered.nowrap.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
                   thead
                     tr
-                      th Member Code
-                      th Member's username
-                      th Full Name
-                      th Title
-                      th Work At
-                      th Description
+                      th(width="5%") Member Code
+                      th(width="20%") Member's username
+                      th(width="20%") Full Name
+                      th(width="10%") Title
+                      th(width="25%") Work At
+                      th(width="20%") Description
+            .card-footer
+              .row
+                .col-12
+                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#addUser')
+                    span.icon.text-gray-600
+                      i.fas.fa-plus
+                    span.text Add Member
+                  a#delete.btn.btn-light.btn-icon-split(href="#")
+                    span.icon.text-gray-600
+                      i.fas.fa-trash
+                    span.text Remove Member
+  //modal for create a new role
   #addRole.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
     .modal-dialog-centered(role='document')
       .modal-content
         .modal-header
-          h5#exampleModalLabel.modal-title Add a new role
+          h5#exampleModalLabel.modal-title Role Creater
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
@@ -428,41 +326,37 @@ body#page-top
           button#submitAddingRole.btn.btn-primary(type="submit" form="addingRole") Save
       // End of Footer
     // End of Content Wrapper
-  #edit.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
+  //modal for edit role
+  #editer.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
     .modal-dialog-centered(role='document')
       .modal-content
         .modal-header
-          h5#exampleModalLabel.modal-title Add a new role
+          h5#exampleModalLabel.modal-title Role Editer
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
-          form()
-            .row
-              .col-4
-                p Code (<b style="color:red">*</b>)
-              .col-8
-                .input-group
-                  input(type="text" style={width:"100%"} placeholder="Role's code")
+          form#editRole()
             .row
               .col-4
                 p Role (<b style="color:red">*</b>)
               .col-8
                 .input-group
-                  input(type="text" style={width:"100%"} placeholder="Role's name")
+                  input#inputNameRole(name="role" type="text" style={width:"100%"} placeholder="Role's name")
             .row
               .col-4
                 p Description
               .col-8
                 .input-group
-                  textarea(name="note", cols="30", rows="7" placeholder="Note")
-                  a.btn.btn-primary(href='#') Save
+                  textarea#inputNoteRole(name="note", cols="30", rows="7" placeholder="Note")
         .modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-  #detail.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
+          button#submitEdit.btn.btn-primary(type="submit" form="editRole") Save
+  //modal for grant
+  #grant.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
     .modal-dialog-centered(role='document')
       .modal-content
         .modal-header
-          h5#exampleModalLabel.modal-title Add a new role
+          h5#exampleModalLabel.modal-title Grant Permision
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
@@ -471,6 +365,30 @@ body#page-top
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           a.btn.btn-primary(href='#') Save
   //detail do later
+  //modal for add new user
+  #addUser.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
+    .modal-dialog-centered#widther(role='document')
+      .modal-content
+        .modal-header
+          h5#exampleModalLabel.modal-title User Adder
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+        .modal-body#rmpadding
+          .card#card3
+            .card-body.card-body-2
+              .table-responsive
+                table#dataTableUser.table.table-bordered.nowrap.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
+                  thead
+                    tr
+                      th ID
+                      th Username
+                      th Full Name
+                      th Title
+                      th Work At
+                      th Description
+        .modal-footer
+          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          button#submitAddingUser.btn.btn-primary(type="submit" form="addingUser") Add
   // End of Page Wrapper
   // Scroll to Top Button
   a.scroll-to-top.rounded(href='#page-top')
@@ -488,8 +406,8 @@ body#page-top
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           a.btn.btn-primary(href='/logout') Logout
   // Bootstrap core JavaScript
-  script(src='http://localhost:3000/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js')
+  script(src='http://localhost:1999/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js')
   // Core plugin JavaScript
-  script(src='http://localhost:3000/dashboard/vendor/jquery-easing/jquery.easing.min.js')
+  script(src='http://localhost:1999/dashboard/vendor/jquery-easing/jquery.easing.min.js')
   // Custom scripts for all pages
-  script(src='http://localhost:3000/dashboard/js/sb-admin-2.min.js')
+  script(src='http://localhost:1999/dashboard/js/sb-admin-2.min.js')
