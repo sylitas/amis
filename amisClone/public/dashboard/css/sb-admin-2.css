@@ -11263,6 +11263,6 @@ body{overflow:hidden;}
 #card2{height:30%;}
 #card3{height:auto;}
 ::-webkit-scrollbar {width: 0;background: transparent;}
-#card1 table td{cursor:pointer;}
+table td{cursor:pointer;}
 #widther{width: 800px;margin-left:-350px;}
 #rmpadding{padding:0;}

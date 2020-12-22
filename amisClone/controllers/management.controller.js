@@ -1,5 +1,4 @@
 var conn = require("../database/main.database");
-
 module.exports.getRole = (req,res)=>{
     res.render("role");
 };
@@ -154,8 +153,83 @@ module.exports.postEditRole = (req,res)=>{
     });
 };
 module.exports.postUserDataByAjax = (req,res)=>{
-    //mai lam
+    var dataList = [];
+    var draw = req.body.draw;
+    var recordsTotal; 
+    var recordsFiltered;
+    var searchStr = req.body.search.value;
+    var sql = 'SELECT userId,accountName,fullName,title,workplace,userNote FROM `user`';
+    conn.query(sql,(err,rs)=>{
+        if(err)throw err;
+        recordsTotal = rs.length;
+        recordsFiltered = rs.length;
+        var sql = 'SELECT userId,accountName,fullName,title,workplace,userNote FROM `user` WHERE accountName LIKE "%'+searchStr+'%"';
+        conn.query(sql,(err,rs)=>{
+            if(err)throw err;
+            if(searchStr){
+                recordsFiltered = rs.length;
+            }
+            for(var i = 0;i<rs.length;i++){
+                var id = rs[i].userId;
+                var username = rs[i].accountName;
+                var fullname = rs[i].fullName;
+                var title = rs[i].title;
+                var place = rs[i].workplace;
+                var note = rs[i].userNote;
+                var arr_data = [id,username,fullname,title,place,note];
+                var vad = func_validate(arr_data);
+                var data = {
+                    "id":vad[0],
+                    "username":vad[1],
+                    "fullname":vad[2],
+                    "title":vad[3],
+                    "place":vad[4],
+                    "note":vad[5]
+                };
+                dataList.push(data);
+            }
+            var dataSend = {
+                "draw":draw,
+                "recordsTotal":recordsTotal,
+                "recordsFiltered":recordsFiltered,
+                "data":dataList
+            }
+            res.send(dataSend);
+        });
+    });
 };
+module.exports.postDataForAddingUser = (req,res)=>{
+    var roleId = req.body.roleId;
+    var userId = req.body.userId;
+    for(var i=0;i<userId.length;i++){
+        //ok
+        var sql ="SELECT * FROM `userUserRole` WHERE userId = ? AND userRoleId = ?";
+        var id = userId[i];
+        conn.query(sql,[id,roleId],(err,rs)=>{
+            if(err) throw err;
+            if(rs.length>0){
+                //not ok
+                res.send("One or more is already in that role");
+            }else{
+                //not ok
+                var sql ="INSERT INTO `userUserRole`(userId,userRoleId) VALUES(?,?)";
+                conn.query(sql,[id,roleId],(err,rs)=>{
+                    if(err)throw err;
+                    res.send("done");
+                });
+            }
+        })
+    }
+};
+module.exports.postDeleteUserInRole = (req,res)=>{
+    var roleId = req.body.roleId;
+    var userId = req.body.userId;
+    var sql = "DELETE FROM `userUserRole` WHERE `userUserRole`.`userId` = ? AND `userUserRole`.`userRoleId` = ?";
+    conn.query(sql,[userId,roleId],(err,rs)=>{
+        if(err) throw err;
+        res.send("Done");
+    });
+}
 function func_validate(data){
     for(var i=0;i<data.length;i++){
         if(data[i] == null){data[i] = "";}
