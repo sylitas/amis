@@ -230,6 +230,25 @@ module.exports.postDeleteUserInRole = (req,res)=>{
         res.send("Done");
     });
 }
+module.exports.postActionData = (req,res)=>{
+    //do it later
+}
+module.exports.postFuction = (req,res)=>{
+    var sql = "SELECT * FROM `function`";
+    conn.query(sql,(err,rs)=>{
+        if(err)throw err;
+        var dataList = [];
+        for(var i = 0;i<rs.length;i++){
+            var data = {
+                "id":rs[i].functionId,
+                "name":rs[i].functionName,
+                "note":rs[i].functionNote
+            }
+            dataList.push(data);
+        }
+        res.send(dataList);
+    });
+}
 function func_validate(data){
     for(var i=0;i<data.length;i++){
         if(data[i] == null){data[i] = "";}

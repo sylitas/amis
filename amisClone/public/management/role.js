@@ -81,6 +81,37 @@ $(document).ready(function() {
             "url":"http://localhost:1999/management/role/postUserInRoleByAjax"
         }
     });
+    // var tableAction = $('#action').DataTable({
+    //     "scrollY":"50vh",
+    //     "paging":   false,
+    //     "ordering": false,
+    //     "info":     false,
+    //     "processing": true,
+    //     "serverSide": true,
+    //     "ajax": {
+    //         "type": "POST",
+    //         "url":"http://localhost:1999/management/role/postActionData"
+    //     },
+    //     "columns": [
+    //         {"data": "id"}, 
+    //         {"data": "action"}
+    //     ],
+    //     "rowId": function(a) {
+    //         return a.id;
+    //     },
+    //     "columnDefs":[
+    //         {
+    //             'targets':0,
+    //             'checkboxes':{
+    //                 'selectRow':true
+    //             }
+    //         }
+    //     ],
+    //     'select': {
+    //         'style': 'multi'
+    //      },
+    //     'order': [[1, 'asc']]
+    // });
     $('#addingUser').on('submit', function(e){
         var arr_rows = [];
         id = $(".table-primary").find("td:first-child").text();
@@ -220,23 +251,43 @@ $(document).ready(function() {
     tableContained.ajax.reload();
     });
     $("#deleteUserInRole").click(function(){
-        var cf = confirm("Are you sure want to remove this user ?");
-        if(cf == true){
-            var roleId = $(".table-primary").find("td:first-child").text();
-            $.ajax({
-                url:"http://localhost:1999/management/role/postDeleteUserInRole",
-                method:"POST",
-                data:{
-                    "userId":"userId",
-                    "roleId":roleId
-                }
-            }).done(function(rs){
-                alert(rs);
-            });
+        if($("tr").hasClass("table-inew")){
+            var cf = confirm("Are you sure want to remove this user ?");
+            if(cf == true){
+                var roleId = $(".table-primary").find("td:first-child").text();
+                var userId = $(".table-inew").find("td:first-child").text();
+                $.ajax({
+                    url:"http://localhost:1999/management/role/postDeleteUserInRole",
+                    method:"POST",
+                    data:{
+                        "userId":userId,
+                        "roleId":roleId
+                    }
+                }).done(function(rs){
+                    tableContained.ajax.reload();
+                });
+            }
+        }else{
+            alert("Please choose an user for using delete function !");
         }
     });
     $("#dataTable-contained").on('click','tr',function(){
-        $(this).siblings().removeClass('table-info');
-        $(this).addClass('table-info');
+        if($(this).hasClass('table-inew')){
+            $(this).removeClass('table-inew');
+        }else{
+            $(this).siblings().removeClass('table-inew');
+            $(this).addClass('table-inew');
+        }
     });
-});
+    $("#grantPermission").click(function(){
+        $.ajax({
+            method:"POST",
+            url:"http://localhost:1999/management/role/postFuction"
+        }).done(function(rs){
+            for(var i=0;i<rs.length;i++){
+                console.log(rs[i].name);
+                $(".nested").append("<li>"+rs[i].name+"</li>");
+            }
+        });
+    });
+}); 

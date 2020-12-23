@@ -245,7 +245,7 @@ body#page-top
                   a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#addRole')
                     span.icon.text-gray-600
                       i.fas.fa-plus
-                    span.text Create Role
+                    span.text Create
                   a#edit.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#editer')
                     span.icon.text-gray-600
                       i.fas.fa-edit
@@ -259,7 +259,7 @@ body#page-top
                       i.fas.fa-sync
                     span.text Reload
                   span.text |   
-                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#grant')
+                  a#grantPermission.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#grant')
                     span.icon.text-gray-600
                       i.fas.fa-network-wired
                     span.text Grant Permision
@@ -296,11 +296,11 @@ body#page-top
                   a#addMember.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#addUser')
                     span.icon.text-gray-600
                       i.fas.fa-plus
-                    span.text Add Member
-                  a#delete.btn.btn-light.btn-icon-split(href="#")
+                    span.text Add
+                  a#deleteUserInRole.btn.btn-light.btn-icon-split(href="#")
                     span.icon.text-gray-600
                       i.fas.fa-trash
-                    span.text Remove Member
+                    span.text Remove
   //modal for create a new role
   #addRole.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
     .modal-dialog-centered(role='document')
@@ -355,17 +355,34 @@ body#page-top
           button#submitEdit.btn.btn-primary(type="submit" form="editRole") Save
   //modal for grant
   #grant.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
-    .modal-dialog-centered(role='document')
+    .modal-dialog-centered#widther(role='document')
       .modal-content
         .modal-header
           h5#exampleModalLabel.modal-title Grant Permision
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
-          
+          .row
+            .col-9
+              h5 Function
+              ul#myUL
+                li
+                  span.caret Function
+                  ul.nested
+            .col-3
+              h5 Action
+              .card
+                .card-body
+                  .table-responsive
+                    form#checkboxAction
+                      table#action.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border.table-striped(width='100%' cellspacing='0')
+                        thead
+                          tr
+                            th ID
+                            th Action
         .modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          a.btn.btn-primary(href='#') Save
+          button#submitCheckboxAction.btn.btn-primary(type="submit" form="checkboxAction") Save
   //detail do later
   //modal for add new user
   #addUser.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')

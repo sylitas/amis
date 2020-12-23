@@ -24,5 +24,9 @@ router.post('/postUserDataByAjax',controller.postUserDataByAjax);
 router.post('/postDataForAddingUser',controller.postDataForAddingUser);
 //For delete user in role
 router.post('/postDeleteUserInRole',controller.postDeleteUserInRole);
+//For Take Data from data to table
+router.post('/postActionData',controller.postActionData);
+//For function
+router.post('/postFuction',controller.postFuction);
 
 module.exports = router;

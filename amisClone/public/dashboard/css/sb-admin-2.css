@@ -11,6 +11,7 @@
  * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
  */
 :root {
+  --imew:#4e73df;
   --blue: #4e73df;
   --indigo: #6610f2;
   --purple: #6f42c1;
@@ -11266,3 +11267,63 @@ body{overflow:hidden;}
 table td{cursor:pointer;}
 #widther{width: 800px;margin-left:-350px;}
 #rmpadding{padding:0;}
+.table-inew,
+.table-inew > th,
+.table-inew > td {
+  background-color: #cdd8f6;
+}
+
+.table-inew th,
+.table-inew td,
+.table-inew thead th,
+.table-inew tbody + tbody {
+  border-color: #a3b6ee;
+}
+
+.table-hover .table-inew:hover {
+  background-color: #b7c7f2;
+}
+
+.table-hover .table-inew:hover > td,
+.table-hover .table-inew:hover > th {
+  background-color: #b7c7f2;
+}
+
+ul, #myUL {
+  list-style-type: none;
+}
+
+/* Remove margins and padding from the parent ul */
+#myUL {
+  margin: 0;
+  padding: 0;
+}
+
+/* Style the caret/arrow */
+.caret {
+  cursor: pointer;
+  user-select: none; /* Prevent text selection */
+}
+
+/* Create the caret/arrow with a unicode, and style it */
+.caret::before {
+  content: "\25B6";
+  color: black;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+/* Rotate the caret/arrow icon when clicked on (using JavaScript) */
+.caret-down::before {
+  transform: rotate(90deg);
+}
+
+/* Hide the nested list */
+.nested {
+  display: none;
+}
+
+/* Show the nested list when the user clicks on the caret/arrow (with JavaScript) */
+.active {
+  display: block;
+}
