@@ -81,37 +81,42 @@ $(document).ready(function() {
             "url":"http://localhost:1999/management/role/postUserInRoleByAjax"
         }
     });
-    // var tableAction = $('#action').DataTable({
-    //     "scrollY":"50vh",
-    //     "paging":   false,
-    //     "ordering": false,
-    //     "info":     false,
-    //     "processing": true,
-    //     "serverSide": true,
-    //     "ajax": {
-    //         "type": "POST",
-    //         "url":"http://localhost:1999/management/role/postActionData"
-    //     },
-    //     "columns": [
-    //         {"data": "id"}, 
-    //         {"data": "action"}
-    //     ],
-    //     "rowId": function(a) {
-    //         return a.id;
-    //     },
-    //     "columnDefs":[
-    //         {
-    //             'targets':0,
-    //             'checkboxes':{
-    //                 'selectRow':true
-    //             }
-    //         }
-    //     ],
-    //     'select': {
-    //         'style': 'multi'
-    //      },
-    //     'order': [[1, 'asc']]
-    // });
+    var tableAction = $('#action').DataTable({
+        "scrollY":"50vh",
+        "paging":   false,
+        "ordering": false,
+        "info":     false,
+        "filter":false,
+        "processing": true,
+        "serverSide": true,
+        "ajax": {
+            "type": "POST",
+            "url":"http://localhost:1999/management/role/postActionData",
+            "data":{
+                "fId":1,
+                "urId":1
+            }
+        },
+        "columns": [
+            {"data": "id"}, 
+            {"data": "name"}
+        ],
+        "rowId": function(a) {
+            return a.id;
+        },
+        "columnDefs":[
+            {
+                'targets':0,
+                'checkboxes':{
+                    'selectRow':true
+                }
+            }
+        ],
+        'select': {
+            'style': 'multi'
+        },
+        'order': [[1, 'asc']]
+    });
     $('#addingUser').on('submit', function(e){
         var arr_rows = [];
         id = $(".table-primary").find("td:first-child").text();
@@ -119,27 +124,34 @@ $(document).ready(function() {
         $.each(rows_selected, function(index, rowId){
             arr_rows.push(rowId);
         });
-        $.ajax({
-            method:"POST",
-            url:"http://localhost:1999/management/role/postDataForAddingUser",
-            data:{
-                "userId":arr_rows,
-                "roleId":id
-            }
-        }).done(function(rs){
-            $("#addUser").modal("hide");
-            tableContained.ajax.reload();
-            $('input:checkbox').removeAttr('checked');
-        });
+        if(arr_rows.length>0){
+            $.ajax({
+                method:"POST",
+                url:"http://localhost:1999/management/role/postDataForAddingUser",
+                data:{
+                    "userId":arr_rows,
+                    "roleId":id
+                }
+            }).done(function(rs){
+                if(rs=="false2"){
+                    alert("Invalid Data");
+                }
+                tableUser.columns(0).checkboxes.deselectAll()
+                tableContained.ajax.reload();
+                $("#addUser").modal("hide");
+            });
+        }else{
+            alert("Invalid Data");
+        }
         e.preventDefault();
     });
     $("#delete").click(function(){
     var cf = confirm("Are you sure want to delete a role ?");
     if(cf == true){
         if($("tr").hasClass("table-primary")){
-        id = $(".table-primary").find("td:first-child").text();
+            id = $(".table-primary").find("td:first-child").text();
         }else{
-        id = 1;
+            id = 1;
         }
         $.ajax({
         method:"POST",
@@ -149,30 +161,6 @@ $(document).ready(function() {
         tableRole.ajax.reload();
         });
     }
-    });
-    $("#dataTable-Role").on('click','tr',function(){
-        id = tableRole.row( this ).id();
-        //addclass
-        $(this).siblings().removeClass('table-primary');
-        $(this).addClass('table-primary');
-        //for reload table
-        tableContained.destroy();
-        tableContained.clear();
-        tableContained = $('#dataTable-contained').DataTable({
-                "scrollY":"20vh",
-                "paging":   false,
-                "ordering": false,
-                "info":     false,
-                "filter": false,
-                "serverSide": true,
-                "ajax": {
-                    "type": "POST",
-                    "url":"/management/role/postUserInRoleByAjax",
-                    "data":{
-                        "id":id
-                    }
-                }
-        });
     });
     $("#submitAddingRole").click(function(e){
     e.preventDefault();
@@ -194,31 +182,31 @@ $(document).ready(function() {
         $('input[name="role"]').val("");
         $('textarea[name="note"]').val("");
         if(err == "false"){
-        alert("This role is already exist !");
+            alert("This role is already exist !");
         }else{
-        alert("Role created!");
+            alert("Role created!");
         }
         $("#addRole").modal("hide");
     });
     });
     $("#edit").click(function(){
-    if($("tr").hasClass("table-primary") == true){
-        id = $(".table-primary").find("td:first-child").text();
-    }else{
-        id = 1;
-    }
-    $.ajax({
-        method:"POST",
-        url:"http://localhost:1999/management/role/takeValueForEditRole",
-        data:{
-        "id":id
+        if($("tr").hasClass("table-primary") == true){
+            id = $(".table-primary").find("td:first-child").text();
+        }else{
+            id = 1;
         }
-    }).done(function(data){
-        if(data=="false"){alert("Invalid Data!")}else{
-        $("#inputNameRole").val(data.name);
-        $("#inputNoteRole").val(data.note);
-        }
-    });
+        $.ajax({
+            method:"POST",
+            url:"http://localhost:1999/management/role/takeValueForEditRole",
+            data:{
+            "id":id
+            }
+        }).done(function(data){
+            if(data=="false"){alert("Invalid Data!")}else{
+                $("#inputNameRole").val(data.name);
+                $("#inputNoteRole").val(data.note);
+            }
+        });
     });
     $("#submitEdit").click(function(e){
     e.preventDefault();
@@ -242,7 +230,7 @@ $(document).ready(function() {
         alert("Role is already exist");
         }else{
         $("#editer").modal("hide");
-        tableRole.ajax.reload();
+            tableRole.ajax.reload();
         }
     });
     });
@@ -268,7 +256,7 @@ $(document).ready(function() {
                 });
             }
         }else{
-            alert("Please choose an user for using delete function !");
+            alert("Please choose an user for using remove function !");
         }
     });
     $("#dataTable-contained").on('click','tr',function(){
@@ -284,10 +272,106 @@ $(document).ready(function() {
             method:"POST",
             url:"http://localhost:1999/management/role/postFuction"
         }).done(function(rs){
-            for(var i=0;i<rs.length;i++){
-                console.log(rs[i].name);
-                $(".nested").append("<li>"+rs[i].name+"</li>");
+            if(!$('li').hasClass("functionList")){
+                for(var i=0;i<rs.length;i++){
+                    $(".nested").append('<li id="'+rs[i].id+'" class= "functionList">'+rs[i].name+"</li>");
+                }
             }
         });
+    });
+    $("#dataTable-Role").on('click','tr',function(){
+        id = tableRole.row( this ).id();
+        //addclass
+        $(this).siblings().removeClass('table-primary');
+        $(this).addClass('table-primary');
+        //for reload table
+        tableContained.destroy();
+        tableContained.clear();
+        tableContained = $('#dataTable-contained').DataTable({
+                "scrollY":"20vh",
+                "paging":   false,
+                "ordering": false,
+                "info":     false,
+                "filter": false,
+                "serverSide": true,
+                "ajax": {
+                    "type": "POST",
+                    "url":"/management/role/postUserInRoleByAjax",
+                    "data":{
+                        "id":id
+                    }
+                }
+        });
+    });
+    $(document).on("click",".functionList",function(){
+        var fId = $(this).attr('id');
+        var urId = $(".table-primary").find("td:first-child").text();
+        //add css class when click
+        $(this).addClass("table-lmao");
+        $(this).siblings().removeClass('table-lmao');
+        //query data from new id
+        tableAction.destroy();
+        tableAction = $('#action').DataTable({
+            "scrollY":"50vh",
+            "paging":   false,
+            "ordering": false,
+            "info":     false,
+            "filter":false,
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "type": "POST",
+                "url":"http://localhost:1999/management/role/postActionData",
+                "data":{
+                    "fId":fId,
+                    "urId":urId
+                }
+            },
+            "columns": [
+                {"data": "id"}, 
+                {"data": "name"}
+            ],
+            "rowId": function(a) {
+                return a.id;
+            },
+            "columnDefs":[
+                {
+                    'targets':0,
+                    'checkboxes':{
+                        'selectRow':true
+                    }
+                }
+            ],
+            'select': {
+                'style': 'multi'
+            },
+            'order': [[1, 'asc']]
+        });
+    });
+    $('#submitCheckboxAction').click(function(e){
+        e.preventDefault();
+        var urId = $(".table-primary").find("td:first-child").text();
+        if($('li').hasClass('table-lmao')){
+            var functionId = $(".table-lmao").attr('id');
+        }else{
+            var functionId = 1;
+        }
+        var actionId = []
+        var rows_selected = tableAction.column(0).checkboxes.selected();
+        $.each(rows_selected, function(index, rowId){
+            actionId.push(rowId);
+        });
+        $.ajax({
+            url:"http://localhost:1999/management/role/postDataForPermission",
+            method:"POST",
+            data:{
+                "fId":functionId,
+                "aId":actionId,
+                "urId":urId
+            }
+        }).done(function(rs){
+            alert("Saved!");
+        });
+        
     });
 }); 

@@ -11327,3 +11327,33 @@ ul, #myUL {
 .active {
   display: block;
 }
+
+.table-lmao,
+.table-lmao > th,
+.table-lmao > td {
+  background-color: #cdd8f6;
+}
+
+.table-lmao th,
+.table-lmao td,
+.table-lmao thead th,
+.table-lmao tbody + tbody {
+  border-color: #a3b6ee;
+}
+
+.table-hover .table-lmao:hover {
+  background-color: #b7c7f2;
+}
+
+.table-hover .table-lmao:hover > td,
+.table-hover .table-lmao:hover > th {
+  background-color: #b7c7f2;
+}
+
+.functionList{
+  cursor: pointer;
+}
+
+.functionList li :hover{
+  color: #b7c7f2;
+}

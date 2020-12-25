@@ -28,5 +28,6 @@ router.post('/postDeleteUserInRole',controller.postDeleteUserInRole);
 router.post('/postActionData',controller.postActionData);
 //For function
 router.post('/postFuction',controller.postFuction);
-
+//For store function and action into database
+router.post('/postDataForPermission',controller.postDataForPermission);
 module.exports = router;
