@@ -1,3 +1,4 @@
+console.log(process.env);
 /*
 English :
 port is the gate for running local/non-local things
@@ -34,7 +35,7 @@ app.set("views","./views");
 //static file (css,jvs,scss,...)
 app.use(express.static('public'));
 //cookie perser config
-app.use(cookieParser('privatekey'));//change later
+app.use(cookieParser(process.env.key));//change later
 // '/'--->authenticate.router.js--->authenticate.controller.js
 //For login, authen with cookies, JWT
 app.use('/',authenticateRouter);

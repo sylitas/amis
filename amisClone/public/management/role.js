@@ -96,6 +96,24 @@ $(document).ready(function() {
                 "fId":1,
                 "urId":1
             }
+            // ,"dataSrc": function(rs){
+            //     for(var i=0;i<rs.data.length;i++){
+            //         if(rs.data[i].check == true){
+            //             $()
+            //         }else{
+            //             console.log("false");
+            //         }
+            //     }
+            //     return rs.data;
+            // }
+        },
+        "initComplete": function(settings){
+            var api = this.api();
+            api.cells(
+                api.rows(function(idx,data,node){
+                    return (data.check == true) ? true : false;
+                }).indexes(),0
+            ).checkboxes.select();
         },
         "columns": [
             {"data": "id"}, 
@@ -112,6 +130,7 @@ $(document).ready(function() {
                 }
             }
         ],
+        'deferRender': true,
         'select': {
             'style': 'multi'
         },
@@ -268,6 +287,8 @@ $(document).ready(function() {
         }
     });
     $("#grantPermission").click(function(){
+        $(".caret").addClass("caret-down");
+        $(".nested").addClass("active");
         $.ajax({
             method:"POST",
             url:"http://localhost:1999/management/role/postFuction"
@@ -303,6 +324,7 @@ $(document).ready(function() {
                 }
         });
     });
+    //click each function to display new action
     $(document).on("click",".functionList",function(){
         var fId = $(this).attr('id');
         var urId = $(".table-primary").find("td:first-child").text();
@@ -327,6 +349,14 @@ $(document).ready(function() {
                     "urId":urId
                 }
             },
+            "initComplete": function(settings){
+                var api = this.api();
+                api.cells(
+                    api.rows(function(idx,data,node){
+                        return (data.check == true) ? true : false;
+                    }).indexes(),0
+                ).checkboxes.select();
+            },
             "columns": [
                 {"data": "id"}, 
                 {"data": "name"}
@@ -342,6 +372,7 @@ $(document).ready(function() {
                     }
                 }
             ],
+            'deferRender': true,
             'select': {
                 'style': 'multi'
             },
@@ -370,8 +401,10 @@ $(document).ready(function() {
                 "urId":urId
             }
         }).done(function(rs){
-            alert("Saved!");
+            alert("Saved!")
+            //$("#grant").modal("hide");
         });
         
     });
+    
 }); 

@@ -1,6 +1,34 @@
+var jwt = require('jsonwebtoken');
+
 var conn = require("../database/main.database");
+var db = require("../database/sqlite.database");
+
+
+var privateKey = process.env.key;
+
 module.exports.getRole = (req,res)=>{
-    res.render("role");
+    if(req.signedCookies.auth_token){
+        var token = req.signedCookies.auth_token;
+        var userId = decode(token,privateKey).userId;
+        var role = decode(token,privateKey).role;
+        db.all("SELECT * FROM `cookies` WHERE cookie = ? AND userId = ?",[token,userId],(err,rs)=>{
+            if(err) throw err;
+            if(rs.length>0){
+                //render
+                var sql = "CALL Proc_SelectUserInUserByUserId(?)";
+                conn.query(sql,[userId],(err,rs)=>{
+                    if(err)throw err;
+                    if(rs.length>0){
+                        var username = rs[0][0].accountName;
+                        //many more
+                        res.render("role",{
+                            "username":username
+                        });
+                    }
+                });
+            }else{res.redirect("/logout");}
+        });
+    }else{res.redirect("/logout");}
 };
 module.exports.postRole = (req,res)=>{
     var dataList = [];
@@ -230,79 +258,104 @@ module.exports.postDeleteUserInRole = (req,res)=>{
         res.send("Done");
     });
 };
+//grant permission
 module.exports.postActionData = (req,res)=>{
+    //database
+    // conn.query("TRUNCATE TABLE permission",(err)=>{if(err)throw err;});
+    // conn.query("SELECT * FROM `functionAction`",(err,rs)=>{
+    //     if(err)throw err;
+    //     var fid_ls = [];
+    //     var aid_ls = [];
+    //     var urid_ls = [];
+    //     for (var i=0;i<rs.length;i++){
+    //         var fId = rs[i].functionId;
+    //         fid_ls.push(fId);
+    //         var aId = rs[i].actionId;
+    //         aid_ls.push(aId);
+    //         var urId = rs[i].userRoleId;
+    //         urid_ls.push(urId);
+    //     }
+    //     for(var i = 0;i<rs.length;i++){
+    //         var fId = fid_ls[i];
+    //         var aId = aid_ls[i];
+    //         var urId = urid_ls[i];
+    //         (function(fId,aId,urId){
+    //             conn.query( "INSERT INTO `permission`(functionId,actionId,userRoleId,isPermission) VALUES(?,?,?,?)",[fId,aId,urId,0],(err,rs)=>{
+    //                 if(err)throw err;
+    //             });
+    //         })(fId,aId,urId);
+    //     }
+    // });
+
+    //receive data
     var fId = req.body.fId;
     var urId = req.body.urId;
-    //
+    //datatable
     var draw = req.body.draw;
-
-
-    //
-    var total = [];
-    var sql = 'CALL Proc_SelectAllActionByFunctionId(?)';
-    conn.query(sql,[fId],(err,rs)=>{
-        if(err)throw err;
-        rs=rs[0];
-        var dataList = [];
-        var recordsTotal = rs.length;
-        var recordsFiltered = rs.length;
-        for(var i = 0;i<rs.length;i++){
-            var id = rs[i].actionId;
-            var name = rs[i].actionName;
-            var arr_data = [id,name];
-            var vad = func_validate(arr_data);
-            var data = {
-                "id":vad[0],
-                "name":vad[1]
-            };
-            dataList.push(data);
+    //code start
+    var sql = "SELECT * FROM `permission` WHERE functionId = ? AND userRoleId = ? AND isPermission = ?";
+    conn.query(sql,[fId,urId,1],(err,rs)=>{
+        if(err) throw err;
+        if(rs.length>0){
+            var sql = "CALL Proc_SelectActionAndPermission(?,?)";
+            conn.query(sql,[fId,urId],(err,rs)=>{
+                if(err)throw err;
+                rs = rs[0];
+                var dataList = [];
+                var recordsTotal = rs.length;
+                var recordsFiltered = rs.length;
+                for(var i = 0;i<rs.length;i++){
+                    var id = rs[i].actionId;
+                    var name = rs[i].actionName;
+                    var check = rs[i].isPermission;
+                    if(check == 0){check = false}else{check = true}
+                    var arr_data = [id,name];
+                    var vad = func_validate(arr_data);
+                    var data = {
+                        "id":vad[0],
+                        "name":vad[1],
+                        "check":check
+                    };
+                    dataList.push(data);
+                }
+                var dataSend = {
+                    "draw":draw,
+                    "recordsTotal":recordsTotal,
+                    "recordsFiltered":recordsFiltered,
+                    "data":dataList
+                }
+                res.send(dataSend);
+            });
+        }else{
+            var sql = 'CALL Proc_SelectAllActionByFunctionId(?)';
+            conn.query(sql,[fId],(err,rs)=>{
+                if(err)throw err;
+                rs=rs[0];
+                var dataList = [];
+                var recordsTotal = rs.length;
+                var recordsFiltered = rs.length;
+                for(var i = 0;i<rs.length;i++){
+                    var id = rs[i].actionId;
+                    var name = rs[i].actionName;
+                    var arr_data = [id,name];
+                    var vad = func_validate(arr_data);
+                    var data = {
+                        "id":vad[0],
+                        "name":vad[1]
+                    };
+                    dataList.push(data);
+                }
+                var dataSend = {
+                    "draw":draw,
+                    "recordsTotal":recordsTotal,
+                    "recordsFiltered":recordsFiltered,
+                    "data":dataList
+                }
+                res.send(dataSend);
+            });
         }
-        var dataSend = {
-            "draw":draw,
-            "recordsTotal":recordsTotal,
-            "recordsFiltered":recordsFiltered,
-            "data":dataList
-        }
-        res.send(dataSend);
     });
-        
-        // var sql = "CAll Proc_SelectAllActionByFunctionId(?)";
-        // conn.query(sql,[fId],(err,rsActionTable)=>{
-        //     if(err)throw err;
-        //     rsActionTable = rsActionTable[0];
-        //     recordsTotal = rsActionTable.length;
-        //     recordsFiltered = rsActionTable.length;
-        //     for(var i=0;i<rsActionTable.length;i++){
-        //         var actionId = rsActionTable[i].actionId;
-        //         total.push(actionId);
-        //     }
-        //     var hasPermission = [];
-        //     var sql = "SELECT actionId FROM `permission` WHERE functionId = ? and userRoleId = ?";
-        //     conn.query(sql,[fId,urId],(err,rs)=>{
-        //         if(err)throw err;
-        //         if(rs.length>0){
-        //             for(var i=0;i<rs.length;i++){
-        //                 var actionId = rs[i].actionId;
-        //                 hasPermission.push(actionId);
-        //             }
-        //             var n = total.length-hasPermission.length+1;
-        //             var notHasPermission = total.slice(n);
-        //             console.log(hasPermission,notHasPermission);//
-
-                    
-        //             var dataSend = {
-        //                 "draw":draw,
-        //                 "recordsTotal":recordsTotal,
-        //                 "recordsFiltered":recordsFiltered,
-        //                 "data":dataList
-        //             }
-        //             res.send(dataSend);
-        //         }else{
-                    
-        //         }
-        //     });
-        // });
-};//fix later
+};
 module.exports.postFuction = (req,res)=>{
     var sql = "SELECT * FROM `function`";
     conn.query(sql,(err,rs)=>{
@@ -323,35 +376,26 @@ module.exports.postDataForPermission = (req,res)=>{
     var fId = req.body.fId;
     var aId = req.body.aId;
     var urId = req.body.urId;
-    conn.query( 
-        "UPDATE `permission` SET isPermission = 0 WHERE functionId = ? AND userRoleId = ?",
-        [fId,urId],
-        (err,rs)=>{
-            if(err)throw err;
-        });
-    for (var i=0;i<aId.length;i++){
-        var id = aId[i];
-        (function(id){
-            conn.query( 
-            "SELECT * FROM `permission` WHERE functionId = ? AND actionId = ? AND userRoleId = ?",
-            [fId,id,urId],
+    if(aId){
+        conn.query( 
+            "UPDATE `permission` SET isPermission = 0 WHERE functionId = ? AND userRoleId = ?",
+            [fId,urId],
             (err,rs)=>{
                 if(err)throw err;
-                if(rs.length > 0){
-                    var sql = "UPDATE `permission` SET isPermission = 1 WHERE functionId = ? AND actionId = ?  AND userRoleId = ?";
-                    conn.query(sql,[fId,id,urId],(err,rs)=>{
-                        if(err)throw err;
-                    });
-                }else{
-                    var sql = "INSERT INTO `permission`(functionId,actionId,userRoleId,isPermission) VALUES(?,?,?,1)";
-                    conn.query(sql,[fId,id,urId],(err,rs)=>{
-                        if(err)throw err;
-                    });
-                }
             });
-        })(id);
+        for (var i=0;i<aId.length;i++){
+            var id = aId[i];
+            (function(id){
+                var sql = "UPDATE `permission` SET isPermission = 1 WHERE functionId = ? AND actionId = ?  AND userRoleId = ?";
+                conn.query(sql,[fId,id,urId],(err,rs)=>{
+                    if(err)throw err;
+                });
+            })(id);
+        }
+        res.send("done");
+    }else{
+        res.send("done");
     }
-    res.send("done");
 };
 function func_validate(data){
     for(var i=0;i<data.length;i++){
@@ -365,7 +409,9 @@ function func_updateRole(id,name,note){
         if(err)throw err;
     });
 }
-function func_data(rs,draw){
-    
-    return dataSend;
+function decode(token,key){
+    return  jwt.verify(token,key,(err,decoded)=>{
+        if(err) throw err;
+        return decoded.data;
+    });
 }
