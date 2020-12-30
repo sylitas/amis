@@ -27,7 +27,7 @@ body#page-top
     // Sidebar
     ul#accordionSidebar.navbar-nav.bg-gradient-primary.sidebar.sidebar-dark.accordion
       // Sidebar - Brand
-      a.sidebar-brand.d-flex.align-items-center.justify-content-center(href='#')
+      a.sidebar-brand.d-flex.align-items-center.justify-content-center(href='/dashboard')
         .sidebar-brand-icon.rotate-n-15
           i.fas.fa-laugh-wink
         .sidebar-brand-text.mx-3
@@ -217,7 +217,7 @@ body#page-top
             // Nav Item - User Information
             li.nav-item.dropdown.no-arrow
               a#userDropdown.nav-link.dropdown-toggle(href='#' role='button' data-toggle='dropdown' aria-haspopup='true' aria-expanded='false')
-                span.mr-2.d-none.d-lg-inline.text-gray-600.small Douglas McGee
+                span.mr-2.d-none.d-lg-inline.text-gray-600.small=username
                 img.img-profile.rounded-circle(src='http://localhost:1999/dashboard/img/undraw_profile.svg')
               // Dropdown - User Information
               .dropdown-menu.dropdown-menu-right.shadow.animated--grow-in(aria-labelledby='userDropdown')
@@ -242,29 +242,29 @@ body#page-top
               h4.mt-0.font-weight-bold.text-primary Roles
               .row
                 .col-12#paddingTop
-                  a.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#addRole')
+                  button#add.btn.btn-light.btn-icon-split(data-toggle='modal' data-target='#addRole')
                     span.icon.text-gray-600
                       i.fas.fa-plus
                     span.text Create
-                  a#edit.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#editer')
+                  button#edit.btn.btn-light.btn-icon-split(data-toggle='modal' data-target='#editer')
                     span.icon.text-gray-600
                       i.fas.fa-edit
                     span.text Edit
-                  a#delete.btn.btn-light.btn-icon-split(href="#")
+                  button#delete.btn.btn-light.btn-icon-split
                     span.icon.text-gray-600
                       i.fas.fa-trash
                     span.text Delete
-                  a#reload.btn.btn-light.btn-icon-split(href="#")
+                  button#reload.btn.btn-light.btn-icon-split
                     span.icon.text-gray-600
                       i.fas.fa-sync
                     span.text Reload
                   span.text |   
-                  a#grantPermission.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#grant')
+                  button#grantPermission.btn.btn-light.btn-icon-split(data-toggle='modal' data-target='#grant')
                     span.icon.text-gray-600
                       i.fas.fa-network-wired
                     span.text Grant Permision
                   span.text | 
-                  a#export.btn.btn-light.btn-icon-split(href="#")
+                  button#export.btn.btn-light.btn-icon-split
                     span.icon.text-gray-600
                       i.fas.fa-file-export
                     span.text Export
@@ -301,6 +301,12 @@ body#page-top
                     span.icon.text-gray-600
                       i.fas.fa-trash
                     span.text Remove
+  .invisible_div
+    p#check_use=use
+    p#check_add=add
+    p#check_edit=edit
+    p#check_del=del
+    p#check_export=exp
   //modal for create a new role
   #addRole.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
     .modal-dialog-centered(role='document')

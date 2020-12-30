@@ -1,4 +1,3 @@
-console.log(process.env);
 /*
 English :
 port is the gate for running local/non-local things
@@ -13,8 +12,11 @@ Author:         duynt
 Objective:      Create management api (focusing on role and grant permision)
 Description:    Using express
 
+.env contains private key
 */
 //require modules
+
+require('dotenv').config({path:".env"});
 var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -35,7 +37,7 @@ app.set("views","./views");
 //static file (css,jvs,scss,...)
 app.use(express.static('public'));
 //cookie perser config
-app.use(cookieParser(process.env.key));//change later
+app.use(cookieParser(process.env.KEY));//change later
 // '/'--->authenticate.router.js--->authenticate.controller.js
 //For login, authen with cookies, JWT
 app.use('/',authenticateRouter);

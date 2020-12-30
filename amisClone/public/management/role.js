@@ -178,6 +178,7 @@ $(document).ready(function() {
         data:{"id":id}
         }).done(function(notif){
         tableRole.ajax.reload();
+        if(notif == "noPermission"){alert("Permission Denied!")}
         });
     }
     });
@@ -197,14 +198,16 @@ $(document).ready(function() {
         "note":note
         }
     }).done(function(err){
-        tableRole.ajax.reload();
-        $('input[name="role"]').val("");
-        $('textarea[name="note"]').val("");
-        if(err == "false"){
+        if(err=="noPermission"){
+            alert("Permission Denied")
+        }else if(err == "false"){
             alert("This role is already exist !");
         }else{
             alert("Role created!");
         }
+        tableRole.ajax.reload();
+        $('input[name="role"]').val("");
+        $('textarea[name="note"]').val("");
         $("#addRole").modal("hide");
     });
     });
@@ -246,11 +249,14 @@ $(document).ready(function() {
         }
     }).done(function(data){
         if(data == "false"){
-        alert("Role is already exist");
+            alert("Role is already exist");
+        }else if(data == "noPermission"){
+            alert("Permission Denied!");
         }else{
-        $("#editer").modal("hide");
             tableRole.ajax.reload();
         }
+        $("#editer").modal("hide");
+        
     });
     });
     $("#reload").click(function(){
@@ -298,6 +304,7 @@ $(document).ready(function() {
                     $(".nested").append('<li id="'+rs[i].id+'" class= "functionList">'+rs[i].name+"</li>");
                 }
             }
+            $("li[id=1]").click();
         });
     });
     $("#dataTable-Role").on('click','tr',function(){
@@ -401,10 +408,36 @@ $(document).ready(function() {
                 "urId":urId
             }
         }).done(function(rs){
-            alert("Saved!")
-            //$("#grant").modal("hide");
+            if(rs=="noPermission"){
+                alert("Permission Denied!");
+            }else{
+                alert("Saved!")
+            }
+            $("#grant").modal("hide");
         });
         
     });
-    
+    //set inactive all
+    $('#add').prop('disabled', true);
+    $('#edit').prop('disabled', true);
+    $('#delete').prop('disabled', true);
+    $('#grantPermission').prop('disabled', true);
+    $('#export').prop('disabled', true);
+    //if true set active
+
+    if($('p[id=check_use]').text()=="true"){
+        $('#grantPermission').prop('disabled', false);
+    }
+    if($('p[id=check_add]').text()=="true"){
+        $('#add').prop('disabled', false);
+    }
+    if($('p[id=check_edit]').text()=="true"){
+        $('#edit').prop('disabled', false);
+    }
+    if($('p[id=check_del]').text()=="true"){
+        $('#delete').prop('disabled', false);
+    }
+    if($('p[id=check_export]').text()=="true"){
+        $('#export').prop('disabled', false);
+    }
 }); 
