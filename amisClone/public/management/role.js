@@ -301,7 +301,11 @@ $(document).ready(function() {
         }).done(function(rs){
             if(!$('li').hasClass("functionList")){
                 for(var i=0;i<rs.length;i++){
-                    $(".nested").append('<li id="'+rs[i].id+'" class= "functionList">'+rs[i].name+"</li>");
+                    if(rs[i].note==null){
+                        $(".nested").append('<li id="'+rs[i].id+'" class= "functionList">'+rs[i].name+"</li>");
+                    }else{
+                        $(".nested").append('<li id="'+rs[i].id+'" class= "functionList">'+rs[i].name+" ( "+rs[i].note+" )"+"</li>");
+                    }
                 }
             }
             $("li[id=1]").click();

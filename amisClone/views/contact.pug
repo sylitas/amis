@@ -20,7 +20,11 @@ head
   script(src='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.js')
   link(type='text/css' href='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css' rel='stylesheet')
   script(type='text/javascript' src='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js')
-  script(src='http://localhost:1999/management/role.js')
+  script(src='http://localhost:1999/management/contact.js')
+  style(type="text/css").
+    td{
+      overflow: hidden !important;
+    }
 body#page-top
   // Page Wrapper
   #wrapper
@@ -239,7 +243,7 @@ body#page-top
         .container-fluid#noPadding
           .card#card1
             .card-header
-              h4.mt-0.font-weight-bold.text-primary Roles
+              h4.mt-0.font-weight-bold.text-primary All Client
               .row
                 .col-12#paddingTop
                   button#add.btn.btn-light.btn-icon-split(data-toggle='modal' data-target='#addRole')
@@ -258,49 +262,22 @@ body#page-top
                     span.icon.text-gray-600
                       i.fas.fa-sync
                     span.text Reload
-                  span.text |   
-                  button#grantPermission.btn.btn-light.btn-icon-split(data-toggle='modal' data-target='#grant')
-                    span.icon.text-gray-600
-                      i.fas.fa-network-wired
-                    span.text Grant Permision
-                  span.text | 
                   button#export.btn.btn-light.btn-icon-split
                     span.icon.text-gray-600
                       i.fas.fa-file-export
                     span.text Export
             .card-body.card-body-1
               .table-responsive
-                table#dataTable-Role.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
+                table#dataTable-Role.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border.display(width='100%' cellspacing='0')
                   thead
                     tr
-                      th(width='10%') Code
-                      th(width='20%') Role
-                      th(width='70%') Description
-          .card#card2
-            .card-header
-              h4.m-0.font-weight-bold.text-primary Role's members
-            .card-body.card-body-2
-              .table-responsive
-                table#dataTable-contained.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
-                  thead
-                    tr
-                      th(width="5%") Member Code
-                      th(width="20%") Member's username
-                      th(width="20%") Full Name
-                      th(width="10%") Title
-                      th(width="25%") Work At
-                      th(width="20%") Description
-            .card-footer
-              .row
-                .col-12
-                  a#addMember.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#addUser')
-                    span.icon.text-gray-600
-                      i.fas.fa-plus
-                    span.text Add
-                  a#deleteUserInRole.btn.btn-light.btn-icon-split(href="#")
-                    span.icon.text-gray-600
-                      i.fas.fa-trash
-                    span.text Remove
+                      th Name
+                      th Phone
+                      th Email
+                      th Address
+                      th Tax
+                      th Type of client
+                      th Budget Code
   .invisible_div
     p#check_use=use
     p#check_add=add
@@ -316,19 +293,44 @@ body#page-top
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
-          form#addingRole()
+          form#addingRole(autocomplete="off")
             .row
               .col-4
-                p Role (<b style="color:red">*</b>)
+                p Name (<b style="color:red">*</b>)
               .col-8
                 .input-group
-                  input(name="role" type="text" style={width:"100%"} placeholder="Role's name")
+                  input(name="name" type="text" style={width:"100%"} placeholder="Name" autocomplete="off")
             .row
               .col-4
-                p Description
+                p Phone
               .col-8
                 .input-group
-                  textarea(name="note", cols="50", rows="7" placeholder="Note")
+                  input(name="phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off")
+            .row
+              .col-4
+                p Email
+              .col-8
+                .input-group
+                  input(name="email" type="text" style={width:"100%"} placeholder="abcd123@123abc.xyz" autocomplete="off")
+            .row
+              .col-4
+                p Address
+              .col-8
+                .input-group
+                  input(name="address" type="text" style={width:"100%"} placeholder="Street, City" autocomplete="off")
+            .row
+              .col-4
+                p Tax
+              .col-8
+                .input-group
+                  input(name="tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off")
+            .row
+              .col-4
+                p Budget Code
+              .col-8
+                .input-group
+                  input(name="bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
+                  
         .modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           button#submitAddingRole.btn.btn-primary(type="submit" form="addingRole") Save
@@ -343,53 +345,47 @@ body#page-top
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
-          form#editRole()
+          form#editerr(autocomplete="off")
             .row
               .col-4
-                p Role (<b style="color:red">*</b>)
+                p Name (<b style="color:red">*</b>)
               .col-8
                 .input-group
-                  input#inputNameRole(name="role" type="text" style={width:"100%"} placeholder="Role's name")
+                  input(name="edit_name" type="text" style={width:"100%"} placeholder="Name" autocomplete="off")
             .row
               .col-4
-                p Description
+                p Phone
               .col-8
                 .input-group
-                  textarea#inputNoteRole(name="note", cols="50", rows="7" placeholder="Note")
+                  input(name="edit_phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off")
+            .row
+              .col-4
+                p Email
+              .col-8
+                .input-group
+                  input(name="edit_email" type="text" style={width:"100%"} placeholder="abcd123@123abc.xyz" autocomplete="off")
+            .row
+              .col-4
+                p Address
+              .col-8
+                .input-group
+                  input(name="edit_address" type="text" style={width:"100%"} placeholder="Street, City" autocomplete="off")
+            .row
+              .col-4
+                p Tax
+              .col-8
+                .input-group
+                  input(name="edit_tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off")
+            .row
+              .col-4
+                p Budget Code
+              .col-8
+                .input-group
+                  input(name="edit_bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
+                  
         .modal-footer
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          button#submitEdit.btn.btn-primary(type="submit" form="editRole") Save
-  //modal for grant
-  #grant.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
-    .modal-dialog-centered#widther(role='document')
-      .modal-content
-        .modal-header
-          h5#exampleModalLabel.modal-title Grant Permision
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
-            span(aria-hidden='true') &times;
-        .modal-body
-          .row
-            .col-9
-              h5 Function
-              ul#myUL
-                li
-                  span.caret Function
-                  ul.nested
-            .col-3
-              h5 Action
-              .card
-                .card-body
-                  .table-responsive
-                    form#checkboxAction
-                      table#action.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border.table-striped(width='100%' cellspacing='0')
-                        thead
-                          tr
-                            th ID
-                            th Action
-        .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          button#submitCheckboxAction.btn.btn-primary(type="submit" form="checkboxAction") Save
-  //detail do later
+          button#submitEditingRole.btn.btn-primary(type="submit" form="editerr") Save
   //modal for add new user
   #addUser.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
     .modal-dialog-centered#widther(role='document')

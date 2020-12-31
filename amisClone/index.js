@@ -25,6 +25,7 @@ var pug = require('pug');
 var authenticateRouter = require("./models/routers/authenticate.router");
 var dashboardRouter = require("./models/routers/dashboard.router");
 var managementRouter = require("./models/routers/management.router");
+var contactRouter = require("./models/routers/contact.router");
 
 var app = express();
 var port = 1999;
@@ -47,6 +48,9 @@ app.use('/dashboard',dashboardRouter);
 // '/management/role'--->management.router.js--->management.controller.js
 // Management is a site that contain everything with manage. Role API is one of them 
 app.use('/management/role',managementRouter);
+//'/contact -->contact.router.js------>contact.controller.js
+// Contact contain all the information of personal client and company client
+app.use('/contact',contactRouter);
 // for logout
 app.use('/logout',(req,res)=>{
     res.clearCookie("auth_token");
@@ -57,4 +61,4 @@ app.use('/logout',(req,res)=>{
 //     res.render('404');   
 // });
 
-app.listen(port,()=>{console.log("Compile complete on "+port);});
+app.listen(port,()=>{console.log("Compile complete on port "+port);});

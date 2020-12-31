@@ -1,5 +1,5 @@
-var jwt = require('jsonwebtoken');
 
+var func_lib = require("./function.controller");
 var conn = require("../database/main.database");
 var db = require("../database/sqlite.database");
 
@@ -9,8 +9,8 @@ var privateKey = process.env.KEY;
 module.exports.getRole = (req,res)=>{
     if(req.signedCookies.auth_token){
         var token = req.signedCookies.auth_token;
-        var userId = decode(token,privateKey).userId;
-        var role = decode(token,privateKey).roleId;
+        var userId = func_lib.decode(token,privateKey).userId;
+        var role = func_lib.decode(token,privateKey).roleId;
         db.all("SELECT * FROM `cookies` WHERE cookie = ? AND userId = ?",[token,userId],(err,rs)=>{
             if(err) throw err;
             if(rs.length>0){
@@ -29,7 +29,7 @@ module.exports.getRole = (req,res)=>{
                                 for(var i=0;i<rs.length;i++){
                                     checkPer.push(rs[i].actionId);
                                 }
-                                var data = func_noPer(checkPer);
+                                var data = func_lib.func_noPer(checkPer);
                                 res.render("role",{
                                     "username":username,
                                     "use":data.use,
@@ -111,7 +111,7 @@ module.exports.postUserInRole = (req,res)=>{
             var workplace = rs[i].workplace;
             var note = rs[i].userNote;
             var data = [id,name,fullname,title,workplace,note];
-            var arr_data = func_validate(data);
+            var arr_data = func_lib.func_validate(data);
             dataList.push(arr_data);
         }
             var dataSend = {
@@ -126,7 +126,7 @@ module.exports.postUserInRole = (req,res)=>{
 //adding Role --done
 module.exports.postAddNewRole = (req,res)=>{
     var token = req.signedCookies.auth_token;
-    var role = decode(token,privateKey).roleId;
+    var role = func_lib.decode(token,privateKey).roleId;
     var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
     conn.query(sql,[role],(err,rs)=>{
         if(err)throw err;
@@ -136,7 +136,7 @@ module.exports.postAddNewRole = (req,res)=>{
             for(var i=0;i<rs.length;i++){
                 checkPer.push(rs[i].actionId);
             }
-            var data = func_noPer(checkPer);
+            var data = func_lib.func_noPer(checkPer);
             if(data.add==true){
                 if(!req.body.role){
                     res.send("Invalid Data!");
@@ -168,7 +168,7 @@ module.exports.postAddNewRole = (req,res)=>{
 //delete function for role--done
 module.exports.postDeleteRole = (req,res)=>{
     var token = req.signedCookies.auth_token;
-    var role = decode(token,privateKey).roleId;
+    var role = func_lib.decode(token,privateKey).roleId;
     var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
     conn.query(sql,[role],(err,rs)=>{
         if(err)throw err;
@@ -178,7 +178,7 @@ module.exports.postDeleteRole = (req,res)=>{
             for(var i=0;i<rs.length;i++){
                 checkPer.push(rs[i].actionId);
             }
-            var data = func_noPer(checkPer);
+            var data = func_lib.func_noPer(checkPer);
             if(data.del==true){
                 if(!req.body.id){
                     res.send("Invalid Data");
@@ -209,7 +209,7 @@ module.exports.takeValueForEditRole = (req,res)=>{
             var name = rs.userRoleName;
             var note = rs.userRoleNote;
             var arr_data = [name,note];
-            var data = func_validate(arr_data);
+            var data = func_lib.func_validate(arr_data);
             var dataSend = {
                 "name":data[0],
                 "note":data[1]
@@ -222,7 +222,7 @@ module.exports.takeValueForEditRole = (req,res)=>{
 };
 module.exports.postEditRole = (req,res)=>{
     var token = req.signedCookies.auth_token;
-    var role = decode(token,privateKey).roleId;
+    var role = func_lib.decode(token,privateKey).roleId;
     var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
     conn.query(sql,[role],(err,rs)=>{
         if(err)throw err;
@@ -232,7 +232,7 @@ module.exports.postEditRole = (req,res)=>{
             for(var i=0;i<rs.length;i++){
                 checkPer.push(rs[i].actionId);
             }
-            var data = func_noPer(checkPer);
+            var data = func_lib.func_noPer(checkPer);
             if(data.edit==true){
                 var id = req.body.id;
                 var name = req.body.name;
@@ -247,11 +247,11 @@ module.exports.postEditRole = (req,res)=>{
                         if(id.toString() !== userRoleId.toString()){
                             res.send("false");
                         }else{
-                            func_updateRole(id,name,note);
+                            func_lib.func_updateRole(id,name,note);
                             res.send("true");
                         }
                     }else{
-                        func_updateRole(id,name,note);
+                        func_lib.func_updateRole(id,name,note);
                         res.send("true");
                     }
                 });
@@ -288,7 +288,7 @@ module.exports.postUserDataByAjax = (req,res)=>{
                 var place = rs[i].workplace;
                 var note = rs[i].userNote;
                 var arr_data = [id,username,fullname,title,place,note];
-                var vad = func_validate(arr_data);
+                var vad = func_lib.func_validate(arr_data);
                 var data = {
                     "id":vad[0],
                     "username":vad[1],
@@ -395,7 +395,7 @@ module.exports.postActionData = (req,res)=>{
                     var check = rs[i].isPermission;
                     if(check == 0){check = false}else{check = true}
                     var arr_data = [id,name];
-                    var vad = func_validate(arr_data);
+                    var vad = func_lib.func_validate(arr_data);
                     var data = {
                         "id":vad[0],
                         "name":vad[1],
@@ -423,7 +423,7 @@ module.exports.postActionData = (req,res)=>{
                     var id = rs[i].actionId;
                     var name = rs[i].actionName;
                     var arr_data = [id,name];
-                    var vad = func_validate(arr_data);
+                    var vad = func_lib.func_validate(arr_data);
                     var data = {
                         "id":vad[0],
                         "name":vad[1]
@@ -444,7 +444,7 @@ module.exports.postActionData = (req,res)=>{
 //clicked grant permission button
 module.exports.postFuction = (req,res)=>{
     var token = req.signedCookies.auth_token;
-    var role = decode(token,privateKey).roleId;
+    var role = func_lib.decode(token,privateKey).roleId;
     var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
     conn.query(sql,[role],(err,rs)=>{
         if(err)throw err;
@@ -454,7 +454,7 @@ module.exports.postFuction = (req,res)=>{
             for(var i=0;i<rs.length;i++){
                 checkPer.push(rs[i].actionId);
             }
-            var data = func_noPer(checkPer);
+            var data = func_lib.func_noPer(checkPer);
             if(data.use==true){
                 var sql = "SELECT * FROM `function`";
                 conn.query(sql,(err,rs)=>{
@@ -480,7 +480,7 @@ module.exports.postFuction = (req,res)=>{
 };
 module.exports.postDataForPermission = (req,res)=>{
     var token = req.signedCookies.auth_token;
-    var role = decode(token,privateKey).roleId;
+    var role = func_lib.decode(token,privateKey).roleId;
     var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
     conn.query(sql,[role],(err,rs)=>{
         if(err)throw err;
@@ -490,7 +490,7 @@ module.exports.postDataForPermission = (req,res)=>{
             for(var i=0;i<rs.length;i++){
                 checkPer.push(rs[i].actionId);
             }
-            var data = func_noPer(checkPer);
+            var data = func_lib.func_noPer(checkPer);
             if(data.use==true){
                 var fId = req.body.fId;
                 var aId = req.body.aId;
@@ -521,38 +521,4 @@ module.exports.postDataForPermission = (req,res)=>{
         }
     });
 };
-function func_validate(data){
-    for(var i=0;i<data.length;i++){
-        if(data[i] == null){data[i] = "";}
-    }
-    return data;
-}
-function func_updateRole(id,name,note){
-    var sql = "CALL Proc_UpdateTableUserRoleById(?,?,?)";
-    conn.query(sql,[id,name,note],(err,rs)=>{
-        if(err)throw err;
-    });
-}
-function decode(token,key){
-    return  jwt.verify(token,key,(err,decoded)=>{
-        if(err) throw err;
-        return decoded.data;
-    });
-}
-function func_noPer(number){
-    for(var i=0;i<number.length;i++){
-        if(number[i] == 1){var f_use = true;}
-        if(number[i] == 2){var f_add = true;}
-        if(number[i] == 3){var f_edit = true;}
-        if(number[i] == 4){var f_delete = true;}
-        if(number[i] == 5){var f_export = true;}
-    }
-    var data = {
-        "use":f_use,
-        "add":f_add,
-        "edit":f_edit,
-        "del":f_delete,
-        "exp":f_export
-    }
-    return data;
-}
+
