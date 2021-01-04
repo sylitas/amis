@@ -34,27 +34,35 @@ $(document).ready(function() {
             searchPlaceholder: "Search Client"
         }
     });
+    //row of datatable clicked
     $("#dataTable-Role").on('click','tr',function(){
         id = tableRole.row( this ).id();
         //addclass
         $(this).siblings().removeClass('table-primary');
         $(this).addClass('table-primary');
     });
+    //delete buttom clicked
     $("#delete").click(function(){
-        var cf = confirm("Are you sure want to delete it ?");
-        if(cf == true){
-            $.ajax({
-                method:"POST",
-                url:"http://localhost:1999/contact/postDeleteDataFromTableClient",
-                data:{
-                    "id":id
-                }
-            }).done(function(rs){
-                tableRole.ajax.reload();
-                alert(rs);
-            })
+        if(id){
+            var cf = confirm("Are you sure want to delete it ?");
+            if(cf == true){
+                $.ajax({
+                    method:"POST",
+                    url:"http://localhost:1999/contact/postDeleteDataFromTableClient",
+                    data:{
+                        "id":id
+                    }
+                }).done(function(rs){
+                    tableRole.ajax.reload();
+                    alert(rs);
+                    id = null;
+                })
+            }
+        }else{
+            alert("Please select a row first !");
         }
     });
+    //submit adding new customer
     $("#submitAddingRole").click(function(e){
         e.preventDefault();
         var name = $('input[name=name]').val();
@@ -63,6 +71,7 @@ $(document).ready(function() {
         var address = $('input[name=address]').val();
         var tax = $('input[name=tax]').val();
         var bc = $('input[name=bc]').val();
+        var toc = $('select[name=toc]').val();
         if(!name){
             alert("Invalid Name");
         }else{
@@ -75,7 +84,8 @@ $(document).ready(function() {
                     "email":email,
                     "address":address,
                     "tax":tax,
-                    "bc":bc
+                    "bc":bc,
+                    "toc":toc
                 }
             }).done(function(rs){
                 alert(rs);
@@ -90,9 +100,11 @@ $(document).ready(function() {
             })
         }
     });
+    //reload buttom
     $("#reload").click(function(){
         tableRole.ajax.reload();
     });
+    //get information when edit buttom clicked
     $("#edit").click(function(){
         $.ajax({
             method:"POST",
@@ -104,8 +116,12 @@ $(document).ready(function() {
             if(rs == "err"){
                 alert("Please select a row first !");
                 $("#editer").modal("hide");
+            }else if(rs == "err2"){
+                alert("No Permission!");
+                $("#editer").modal("hide");
             }else{
                 $('input[name=edit_name]').val(rs.name);
+                $('select[name=edit_toc]').val(rs.toc);
                 $('input[name=edit_phone]').val(rs.phone);
                 $('input[name=edit_email]').val(rs.email);
                 $('input[name=edit_address]').val(rs.address);
@@ -114,6 +130,7 @@ $(document).ready(function() {
             }
         });
     });
+    //submit editing
     $("#submitEditingRole").click(function(e){
         e.preventDefault();
         var name = $('input[name=edit_name]').val();
@@ -122,6 +139,7 @@ $(document).ready(function() {
         var address = $('input[name=edit_address]').val();
         var tax = $('input[name=edit_tax]').val();
         var bc = $('input[name=edit_bc]').val();
+        var toc = $('select[name=edit_toc]').val();
 
         $.ajax({
             method:"POST",
@@ -133,35 +151,64 @@ $(document).ready(function() {
                 "email":email,
                 "address":address,
                 "tax":tax,
-                "bc":bc
+                "bc":bc,
+                "toc":toc
             }
         }).done(function(rs){
             tableRole.ajax.reload();
             $("#editer").modal("hide");
             alert(rs);
         });
-    })
-    // //set inactive all
-    // $('#add').prop('disabled', true);
-    // $('#edit').prop('disabled', true);
-    // $('#delete').prop('disabled', true);
-    // $('#grantPermission').prop('disabled', true);
-    // $('#export').prop('disabled', true);
-    // //if true set active
+    });
+    //cancel when adding customer
+    $("#cancelAddingRole").click(function(){
+        $('input[name=name]').val("");
+        $('input[name=phone]').val("");
+        $('input[name=email]').val("");
+        $('input[name=address]').val("");
+        $('input[name=tax]').val("");
+        $('input[name=bc]').val("");
+        //$("#addRole").modal("hide");
+    });
+    //key Pressed
+    $("html").keyup(function(e){
+        if(e.keyCode == 46){
+            var cf = confirm("Are you sure want to delete it ?");
+            if(cf == true){
+                $.ajax({
+                    method:"POST",
+                    url:"http://localhost:1999/contact/postDeleteDataFromTableClient",
+                    data:{
+                        "id":id
+                    }
+                }).done(function(rs){
+                    tableRole.ajax.reload();
+                    alert(rs);
+                });
+            }
+        }
+    });
+    //set inactive all
+    $('#add').prop('disabled', true);
+    $('#edit').prop('disabled', true);
+    $('#delete').prop('disabled', true);
+    $('#grantPermission').prop('disabled', true);
+    $('#export').prop('disabled', true);
+    //if true set active
 
-    // if($('p[id=check_use]').text()=="true"){
-    //     $('#grantPermission').prop('disabled', false);
-    // }
-    // if($('p[id=check_add]').text()=="true"){
-    //     $('#add').prop('disabled', false);
-    // }
-    // if($('p[id=check_edit]').text()=="true"){
-    //     $('#edit').prop('disabled', false);
-    // }
-    // if($('p[id=check_del]').text()=="true"){
-    //     $('#delete').prop('disabled', false);
-    // }
-    // if($('p[id=check_export]').text()=="true"){
-    //     $('#export').prop('disabled', false);
-    // }
+    if($('p[id=check_use]').text()=="true"){
+        $('#grantPermission').prop('disabled', false);
+    }
+    if($('p[id=check_add]').text()=="true"){
+        $('#add').prop('disabled', false);
+    }
+    if($('p[id=check_edit]').text()=="true"){
+        $('#edit').prop('disabled', false);
+    }
+    if($('p[id=check_del]').text()=="true"){
+        $('#delete').prop('disabled', false);
+    }
+    if($('p[id=check_export]').text()=="true"){
+        $('#export').prop('disabled', false);
+    }
 }); 

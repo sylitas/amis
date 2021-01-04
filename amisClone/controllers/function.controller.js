@@ -9,9 +9,9 @@ function decode(token,key){
 };
 function func_noPer(number){
     for(var i=0;i<number.length;i++){
-        if(number[i] == 1){var f_use = true;}
-        if(number[i] == 2){var f_add = true;}
-        if(number[i] == 3){var f_edit = true;}
+        if(number[i] == 1){var f_use    = true;}
+        if(number[i] == 2){var f_add    = true;}
+        if(number[i] == 3){var f_edit   = true;}
         if(number[i] == 4){var f_delete = true;}
         if(number[i] == 5){var f_export = true;}
     }
@@ -59,6 +59,7 @@ function func_updateRole(id,name,note){
         if(err)throw err;
     });
 };
+
 
 module.exports = {
     decode,

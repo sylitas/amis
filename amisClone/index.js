@@ -57,8 +57,8 @@ app.use('/logout',(req,res)=>{
     res.redirect('/');
 });
 
-// app.use(function(req, res){
-//     res.render('404');   
-// });
+app.use(function(req, res){
+    res.render('404');   
+});
 
 app.listen(port,()=>{console.log("Compile complete on port "+port);});

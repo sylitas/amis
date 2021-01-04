@@ -25,6 +25,13 @@ head
     td{
       overflow: hidden !important;
     }
+    .col-3{
+      text-align:right;
+    }
+    select{
+      background-color:#FFFFFF;
+      padding: 1px 2px;
+    }
 body#page-top
   // Page Wrapper
   #wrapper
@@ -231,9 +238,9 @@ body#page-top
                 a.dropdown-item(href='#')
                   i.fas.fa-cogs.fa-sm.fa-fw.mr-2.text-gray-400
                   |                                     Settings
-                a.dropdown-item(href='#')
+                a.dropdown-item(href='/management/role')
                   i.fas.fa-list.fa-sm.fa-fw.mr-2.text-gray-400
-                  |                                     Activity Log
+                  |                                     Grant Permission
                 .dropdown-divider
                 a.dropdown-item(href='#' data-toggle='modal' data-target='#logoutModal')
                   i.fas.fa-sign-out-alt.fa-sm.fa-fw.mr-2.text-gray-400
@@ -276,7 +283,7 @@ body#page-top
                       th Email
                       th Address
                       th Tax
-                      th Type of client
+                      th Type of Client
                       th Budget Code
   .invisible_div
     p#check_use=use
@@ -289,50 +296,69 @@ body#page-top
     .modal-dialog-centered(role='document')
       .modal-content
         .modal-header
-          h5#exampleModalLabel.modal-title Role Creater
+          h4#exampleModalLabel.modal-title Role Creater
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
           form#addingRole(autocomplete="off")
+            h5.ml-5 General
             .row
-              .col-4
-                p Name (<b style="color:red">*</b>)
-              .col-8
+              .col-1
+              .col-3
+                p Name (<b style="color:red">*</b>) :
+              .col-6
                 .input-group
                   input(name="name" type="text" style={width:"100%"} placeholder="Name" autocomplete="off")
+              .col-1
             .row
-              .col-4
-                p Phone
-              .col-8
+              .col-1
+              .col-3
+                p Type (<b style="color:red">*</b>) :
+              .col-6
                 .input-group
-                  input(name="phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off")
+                  select(name="toc" style={width:"100%"})
+                    option(value="1") Personal Customer
+                    option(value="2") Company Customer
+            h5.ml-5 Contact
             .row
-              .col-4
-                p Email
-              .col-8
+              .col-1
+              .col-3
+                p Phone :
+              .col-6
+                .input-group
+                  input(name="phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off" maxlength="10")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p Email :
+              .col-6
                 .input-group
                   input(name="email" type="text" style={width:"100%"} placeholder="abcd123@123abc.xyz" autocomplete="off")
             .row
-              .col-4
-                p Address
-              .col-8
+              .col-1
+              .col-3
+                p Address :
+              .col-6
                 .input-group
                   input(name="address" type="text" style={width:"100%"} placeholder="Street, City" autocomplete="off")
+            h5.ml-5 Taxation
             .row
-              .col-4
-                p Tax
-              .col-8
+              .col-1
+              .col-3
+                p Tax :
+              .col-6
                 .input-group
-                  input(name="tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off")
+                  input(name="tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off" maxlength="11")
             .row
-              .col-4
-                p Budget Code
-              .col-8
+              .col-1
+              .col-3
+                p Budget Code :
+              .col-6
                 .input-group
                   input(name="bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
-                  
         .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          button#cancelAddingRole.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           button#submitAddingRole.btn.btn-primary(type="submit" form="addingRole") Save
       // End of Footer
     // End of Content Wrapper
@@ -346,40 +372,60 @@ body#page-top
             span(aria-hidden='true') &times;
         .modal-body
           form#editerr(autocomplete="off")
+            h5.ml-5 General
             .row
-              .col-4
-                p Name (<b style="color:red">*</b>)
-              .col-8
+              .col-1
+              .col-3
+                p Name (<b style="color:red">*</b>) :
+              .col-6
                 .input-group
                   input(name="edit_name" type="text" style={width:"100%"} placeholder="Name" autocomplete="off")
+              .col-1
             .row
-              .col-4
-                p Phone
-              .col-8
+              .col-1
+              .col-3
+                p Type (<b style="color:red">*</b>) :
+              .col-6
                 .input-group
-                  input(name="edit_phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off")
+                  select(name="edit_toc" style={width:"100%"})
+                    option(value="1") Personal Customer
+                    option(value="2") Company Customer
+            h5.ml-5 Contact
             .row
-              .col-4
-                p Email
-              .col-8
+              .col-1
+              .col-3
+                p Phone :
+              .col-6
+                .input-group
+                  input(name="edit_phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off" maxlength="10")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p Email :
+              .col-6
                 .input-group
                   input(name="edit_email" type="text" style={width:"100%"} placeholder="abcd123@123abc.xyz" autocomplete="off")
             .row
-              .col-4
-                p Address
-              .col-8
+              .col-1
+              .col-3
+                p Address :
+              .col-6
                 .input-group
                   input(name="edit_address" type="text" style={width:"100%"} placeholder="Street, City" autocomplete="off")
+            h5.ml-5 Taxation
             .row
-              .col-4
-                p Tax
-              .col-8
+              .col-1
+              .col-3
+                p Tax :
+              .col-6
                 .input-group
-                  input(name="edit_tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off")
+                  input(name="edit_tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off" maxlength="11")
             .row
-              .col-4
-                p Budget Code
-              .col-8
+              .col-1
+              .col-3
+                p Budget Code :
+              .col-6
                 .input-group
                   input(name="edit_bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
                   

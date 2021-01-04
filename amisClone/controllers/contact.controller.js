@@ -19,7 +19,7 @@ module.exports.getContactPage = (req,res)=>{
                     if(err)throw err;
                     if(rs.length>0){
                         var username = rs[0][0].accountName;
-                        var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
+                        var sql = "CALL Proc_SelectPermissionByUserRoleName_contact(?)";
                         conn.query(sql,[role],(err,rs)=>{
                             if(err)throw err;
                             rs = rs[0];
@@ -109,76 +109,112 @@ module.exports.postDataForClientTable = (req,res)=>{
 };
 //delete clicked 
 module.exports.postDeleteDataFromTableClient = (req,res)=>{
-    if(req.body.id){
-        conn.query("DELETE FROM `object` WHERE `objectId` = ?",[req.body.id],(err)=>{
-            if(err) throw err;
-            res.send("Deleted!");
-        })
-    }else{
-        res.send("Invalid!");;
-    }
+    isPermission_contact_del(req,function(rs){
+        if(rs == true){
+            if(req.body.id){
+                conn.query("DELETE FROM `object` WHERE `objectId` = ?",[req.body.id],(err)=>{
+                    if(err) throw err;
+                    res.send("Deleted!");
+                })
+            }else{
+                res.send("Invalid!");;
+            }
+        }else{
+            res.send("Don't have permission !");
+        }
+    });
 };
+// isPermission_contact_add(req,function(rs){
+//     if(rs==true){
+
+//     }else{
+//         res.send("Don't have permission !");
+//     }
+// });
+//receive data when submiting
 module.exports.postAddingClientInformation = (req,res)=>{
-    if(req.body.name){
-        var token = req.signedCookies.auth_token;
-        var userId = func_lib.decode(token,privateKey).userId;
-        var name = req.body.name;
-        var phone = req.body.phone;
-        var email = req.body.email;
-        var address = req.body.address;
-        var tax = req.body.tax;
-        var bc = req.body.bc;
-        var validated = func_lib.func_validate_for_query([name,phone,email,address,tax,bc]);
-        if(email){
-            func_lib.func_checkObjectExist(email,function(rs){
-                if(rs == false){
-                    res.send("Client Existed!");
+    isPermission_contact_add(req,function(rs){
+        if(rs==true){
+            if(req.body.name){
+                var token = req.signedCookies.auth_token;
+                var userId = func_lib.decode(token,privateKey).userId;
+                var name = req.body.name;
+                var phone = req.body.phone;
+                var email = req.body.email;
+                var address = req.body.address;
+                var tax = req.body.tax;
+                var bc = req.body.bc;
+                if(req.body.toc === "1" || req.body.toc === "2"){
+                    var toc = parseInt(req.body.toc);
                 }else{
-                    var sql = "INSERT INTO `object`(name,phone,companyEmail,address,tax,budgetCode,userId,objectType) VALUES(?,?,?,?,?,?,?,1)";
-                    conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],validated[5],userId],(err)=>{
+                    res.send("Invalid Data");
+                    return;
+                }
+                //toc = 1 --> Personal Customer
+                //toc = 2 --> Company Customer
+                var validated = func_lib.func_validate_for_query([name,phone,email,address,tax,bc]);
+                if(email){
+                    func_lib.func_checkObjectExist(email,function(rs){
+                        if(rs == false){
+                            res.send("Client Existed!");
+                        }else{
+                            var sql = "INSERT INTO `object`(name,phone,companyEmail,address,tax,budgetCode,userId,objectType) VALUES(?,?,?,?,?,?,?,?)";
+                            conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],validated[5],userId,toc],(err)=>{
+                                if(err) throw err;
+                                res.send("Added!");
+                            });
+                        }
+                    })
+                }else{
+                    var sql = "INSERT INTO `object`(name,phone,companyEmail,address,tax,budgetCode,userId,objectType) VALUES(?,?,?,?,?,?,?,?)";
+                    conn.query(sql,[name,phone,email,address,tax,bc,userId,toc],(err)=>{
                         if(err) throw err;
                         res.send("Added!");
                     });
                 }
-            })
+            }else{
+                res.send("Invalid Name!");
+            }
         }else{
-            var sql = "INSERT INTO `object`(name,phone,companyEmail,address,tax,budgetCode,userId,objectType) VALUES(?,?,?,?,?,?,?,2)";
-            conn.query(sql,[name,phone,email,address,tax,bc,userId],(err)=>{
-                if(err) throw err;
-                res.send("Added!");
-            });
+            res.send("Don't have permission !");
         }
-    }else{
-        res.send("Invalid Name!");
-    }
+    });
 };
 //click edit
 module.exports.postDataForEdit = (req,res)=>{
-    if(req.body.id){
-        var sql = "SELECT * FROM `object` WHERE objectId = ?";
-        conn.query(sql,[req.body.id],(err,rs)=>{
-            if(err) throw err;
-            var name = rs[0].name;
-            var phone = rs[0].phone;
-            var email = rs[0].email;
-            var address = rs[0].address;
-            var tax = rs[0].tax;
-            var bc = rs[0].budgetCode;
-
-            var data = func_lib.func_validate_for_edit([name,phone,email,address,tax,bc]);
-            var dataSend = {
-                "name":data[0],
-                "phone":data[1],
-                "email":data[2],
-                "address":data[3],
-                "tax":data[4],
-                "bc":data[5]
+    isPermission_contact_edit(req,function(rs){
+        if(rs==true){
+            if(req.body.id){
+                var sql = "SELECT * FROM `object` WHERE objectId = ?";
+                conn.query(sql,[req.body.id],(err,rs)=>{
+                    if(err) throw err;
+                    var name = rs[0].name;
+                    var phone = rs[0].phone;
+                    var email = rs[0].email;
+                    var address = rs[0].address;
+                    var tax = rs[0].tax;
+                    var bc = rs[0].budgetCode;
+                    var toc = rs[0].objectType;
+    
+                    var data = func_lib.func_validate_for_edit([name,phone,email,address,tax,bc]);
+                    var dataSend = {
+                        "name":data[0],
+                        "phone":data[1],
+                        "email":data[2],
+                        "address":data[3],
+                        "tax":data[4],
+                        "bc":data[5],
+                        "toc":toc
+                    }
+                    res.send(dataSend);
+                });
+            }else{
+                res.send("err")
             }
-            res.send(dataSend);
-        });
-    }else{
-        res.send("err")
-    }
+        }else{
+            res.send("err2");
+        }
+    });
 };
 //submit editer
 module.exports.postEditData = (req,res)=>{
@@ -190,8 +226,14 @@ module.exports.postEditData = (req,res)=>{
         var address = req.body.address;
         var tax = req.body.tax;
         var bc = req.body.bc;
-        var sql = "UPDATE `object` SET name = ? , phone = ? , companyEmail = ? , address = ? , tax = ? , budgetCode = ? WHERE objectId = ?";
-        conn.query(sql,[name,phone,email,address,tax,bc,id],(err,rs)=>{
+        if(req.body.toc === "1" || req.body.toc === "2"){
+            var toc = parseInt(req.body.toc);
+        }else{
+            res.send("Invalid Data");
+            return;
+        }
+        var sql = "UPDATE `object` SET name = ? , phone = ? , companyEmail = ? , address = ? , tax = ? , budgetCode = ? , objectType = ? WHERE objectId = ?";
+        conn.query(sql,[name,phone,email,address,tax,bc,toc,id],(err,rs)=>{
             if(err)throw err;
             res.send("Updated!");
         });
@@ -199,3 +241,72 @@ module.exports.postEditData = (req,res)=>{
         res.send("Please fill inside (*) tag");
     }
 };
+function isPermission_contact_del(req,callback){
+    var token = req.signedCookies.auth_token;
+    var role = func_lib.decode(token,privateKey).roleId;
+    var sql = "CALL Proc_SelectPermissionByUserRoleName_contact(?)";
+    conn.query(sql,[role],(err,rs)=>{
+        if(err)throw err;
+        rs = rs[0];
+        var checkPer = [];
+        if(rs.length>0){
+            for(var i=0;i<rs.length;i++){
+                checkPer.push(rs[i].actionId);
+            }
+            var data = func_lib.func_noPer(checkPer);
+            if(data.del==true){
+                callback(true);
+            }else{
+                callback(false);
+            }
+        }else{
+            callback(false);
+        }
+    });
+}
+function isPermission_contact_add(req,callback){
+    var token = req.signedCookies.auth_token;
+    var role = func_lib.decode(token,privateKey).roleId;
+    var sql = "CALL Proc_SelectPermissionByUserRoleName_contact(?)";
+    conn.query(sql,[role],(err,rs)=>{
+        if(err)throw err;
+        rs = rs[0];
+        var checkPer = [];
+        if(rs.length>0){
+            for(var i=0;i<rs.length;i++){
+                checkPer.push(rs[i].actionId);
+            }
+            var data = func_lib.func_noPer(checkPer);
+            if(data.add==true){
+                callback(true);
+            }else{
+                callback(false);
+            }
+        }else{
+            callback(false);
+        }
+    });
+}
+function isPermission_contact_edit(req,callback){
+    var token = req.signedCookies.auth_token;
+    var role = func_lib.decode(token,privateKey).roleId;
+    var sql = "CALL Proc_SelectPermissionByUserRoleName_contact(?)";
+    conn.query(sql,[role],(err,rs)=>{
+        if(err)throw err;
+        rs = rs[0];
+        var checkPer = [];
+        if(rs.length>0){
+            for(var i=0;i<rs.length;i++){
+                checkPer.push(rs[i].actionId);
+            }
+            var data = func_lib.func_noPer(checkPer);
+            if(data.edit==true){
+                callback(true);
+            }else{
+                callback(false);
+            }
+        }else{
+            callback(false);
+        }
+    });
+} 
