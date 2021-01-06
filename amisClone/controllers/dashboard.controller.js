@@ -4,7 +4,7 @@ var conn = require("../database/main.database");
 var db = require("../database/sqlite.database");
 
 //private key for JWT
-var privateKey = process.env.KEY//change later
+var privateKey = process.env.KEY
 
 function decode(token,key){
     return  jwt.verify(token,key,(err,decoded)=>{

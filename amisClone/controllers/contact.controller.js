@@ -124,13 +124,6 @@ module.exports.postDeleteDataFromTableClient = (req,res)=>{
         }
     });
 };
-// isPermission_contact_add(req,function(rs){
-//     if(rs==true){
-
-//     }else{
-//         res.send("Don't have permission !");
-//     }
-// });
 //receive data when submiting
 module.exports.postAddingClientInformation = (req,res)=>{
     isPermission_contact_add(req,function(rs){

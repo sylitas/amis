@@ -32,6 +32,12 @@ head
       background-color:#FFFFFF;
       padding: 1px 2px;
     }
+    h5{
+      border-bottom: 1px solid black !important;
+    }
+    .marginhere{
+      margin-bottom:15px;
+    }
 body#page-top
   // Page Wrapper
   #wrapper
@@ -296,12 +302,15 @@ body#page-top
     .modal-dialog-centered(role='document')
       .modal-content
         .modal-header
-          h4#exampleModalLabel.modal-title Role Creater
+          h4#exampleModalLabel.modal-title Adding Customer
           button.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
           form#addingRole(autocomplete="off")
-            h5.ml-5 General
+            .row
+              .col-1
+              .col-10.marginhere
+                h5 General
             .row
               .col-1
               .col-3
@@ -319,7 +328,10 @@ body#page-top
                   select(name="toc" style={width:"100%"})
                     option(value="1") Personal Customer
                     option(value="2") Company Customer
-            h5.ml-5 Contact
+            .row
+              .col-1
+              .col-10.marginhere  
+                h5 Contact
             .row
               .col-1
               .col-3
@@ -342,7 +354,10 @@ body#page-top
               .col-6
                 .input-group
                   input(name="address" type="text" style={width:"100%"} placeholder="Street, City" autocomplete="off")
-            h5.ml-5 Taxation
+            .row
+              .col-1
+              .col-10.marginhere
+                h5 Taxation
             .row
               .col-1
               .col-3
@@ -372,7 +387,10 @@ body#page-top
             span(aria-hidden='true') &times;
         .modal-body
           form#editerr(autocomplete="off")
-            h5.ml-5 General
+            .row
+              .col-1
+              .col-10.marginhere
+                h5 General
             .row
               .col-1
               .col-3
@@ -390,7 +408,10 @@ body#page-top
                   select(name="edit_toc" style={width:"100%"})
                     option(value="1") Personal Customer
                     option(value="2") Company Customer
-            h5.ml-5 Contact
+            .row
+              .col-1
+              .col-10.marginhere
+                h5 Contact
             .row
               .col-1
               .col-3
@@ -413,7 +434,10 @@ body#page-top
               .col-6
                 .input-group
                   input(name="edit_address" type="text" style={width:"100%"} placeholder="Street, City" autocomplete="off")
-            h5.ml-5 Taxation
+            .row
+              .col-1
+              .col-10.marginhere
+                h5 Taxation
             .row
               .col-1
               .col-3
