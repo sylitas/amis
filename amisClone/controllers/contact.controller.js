@@ -134,6 +134,8 @@ module.exports.postAddingClientInformation = (req,res)=>{
                 var name = req.body.name;
                 var phone = req.body.phone;
                 var email = req.body.email;
+                var city = req.body.city;
+                var district = req.body.district;
                 var address = req.body.address;
                 var tax = req.body.tax;
                 var bc = req.body.bc;
@@ -145,24 +147,37 @@ module.exports.postAddingClientInformation = (req,res)=>{
                 }
                 //toc = 1 --> Personal Customer
                 //toc = 2 --> Company Customer
-                var validated = func_lib.func_validate_for_query([name,phone,email,address,tax,bc]);
+                var validated = func_lib.func_validate_for_query([name,phone,email,tax,bc]);
                 if(email){
                     func_lib.func_checkObjectExist(email,function(rs){
                         if(rs == false){
                             res.send("Client Existed!");
                         }else{
-                            var sql = "INSERT INTO `object`(name,phone,companyEmail,address,tax,budgetCode,userId,objectType) VALUES(?,?,?,?,?,?,?,?)";
-                            conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],validated[5],userId,toc],(err)=>{
-                                if(err) throw err;
-                                res.send("Added!");
+                            Create_Location(city,district,address,(err,locationId)=>{
+                                if(err){
+                                    return;
+                                }else{
+                                    var sql = "INSERT INTO `object`(name,phone,companyEmail,tax,budgetCode,userId,objectType,locationId) VALUES(?,?,?,?,?,?,?,?)";
+                                    conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],userId,toc,locationId],(err)=>{
+                                        if(err) throw err;
+                                        res.send("Added!");
+                                    });
+                                }
                             });
                         }
                     })
                 }else{
-                    var sql = "INSERT INTO `object`(name,phone,companyEmail,address,tax,budgetCode,userId,objectType) VALUES(?,?,?,?,?,?,?,?)";
-                    conn.query(sql,[name,phone,email,address,tax,bc,userId,toc],(err)=>{
-                        if(err) throw err;
-                        res.send("Added!");
+                    //fix later
+                    Create_Location(city,district,address,(err,locationId)=>{
+                        if(err){
+                            return;
+                        }else{
+                            var sql = "INSERT INTO `object`(name,phone,companyEmail,tax,budgetCode,userId,objectType,locationId) VALUES(?,?,?,?,?,?,?,?)";
+                            conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],userId,toc,locationId],(err)=>{
+                                if(err) throw err;
+                                res.send("Added!");
+                            });
+                        }
                     });
                 }
             }else{
@@ -256,7 +271,7 @@ function isPermission_contact_del(req,callback){
             callback(false);
         }
     });
-}
+};
 function isPermission_contact_add(req,callback){
     var token = req.signedCookies.auth_token;
     var role = func_lib.decode(token,privateKey).roleId;
@@ -279,7 +294,7 @@ function isPermission_contact_add(req,callback){
             callback(false);
         }
     });
-}
+};
 function isPermission_contact_edit(req,callback){
     var token = req.signedCookies.auth_token;
     var role = func_lib.decode(token,privateKey).roleId;
@@ -302,4 +317,68 @@ function isPermission_contact_edit(req,callback){
             callback(false);
         }
     });
-} 
+};
+function Create_Location(city,district,address,callback){
+    if(!address){address=null;}
+    if(city){
+        var sql = "SELECT `cityName` FROM `city` WHERE cityName = ?";
+        conn.query(sql,[city],(err,rs)=>{
+            if(err) throw err;
+            if(rs.length==0){
+                var sql = "INSERT INTO `city`(cityName) VALUES (?)";
+                conn.query(sql,[city],(err)=>{
+                    if(err) throw err;
+                });
+            }
+            var sql = "SELECT `cityId` FROM `city` WHERE cityName = ?";
+            conn.query(sql,[city],(err,rs)=>{
+                if(err) throw err;
+                var cityId = rs[0].cityId
+                if(district){
+                    var sql = "SELECT `districtName` FROM `district` WHERE districtName = ?";
+                    conn.query(sql,[district],(err,rs)=>{
+                        if(err) throw err;
+                        if(rs.length==0){
+                            var sql = "INSERT INTO `district`(cityId,districtName) VALUES (?,?)";
+                            conn.query(sql,[cityId,district],(err)=>{
+                                if(err) throw err;
+                            });
+                        }
+                        var sql = "SELECT `districtId` FROM `district` WHERE `districtName` = ? AND cityId = ?";
+                        conn.query(sql,[district,cityId],(err,rs)=>{
+                            if(err) throw err;
+                            var districtId = rs[0].districtId;
+                            var sql = "INSERT INTO `location`(cityId,districtId,address) VALUES(?,?,?)";
+                            conn.query(sql,[cityId,districtId,address],(err)=>{
+                                if(err)throw err;
+                            });
+                            var sql = "SELECT `locationId` FROM `location` WHERE cityId = ?";
+                            conn.query(sql,[cityId],(err,rs)=>{
+                                if(err){
+                                    callback(err,null);
+                                }else{
+                                    callback(null,rs[0].locationId);
+                                }
+                            });
+                        });
+                    });
+                }else{
+                    var sql = "INSERT INTO `location`(cityId,address) VALUES(?,?)";
+                    conn.query(sql,[cityId,address],(err)=>{
+                        if(err)throw err;
+                    });
+                    var sql = "SELECT `locationId` FROM `location` WHERE cityId = ?";
+                    conn.query(sql,[cityId],(err,rs)=>{
+                        if(err){
+                            callback(err,null);
+                        }else{
+                            callback(null,rs[0].locationId);
+                        }
+                    });
+                }
+            });
+        });
+    }else{
+        return;
+    }
+}

@@ -68,6 +68,12 @@ $(document).ready(function() {
         var name = $('input[name=name]').val();
         var phone = $('input[name=phone]').val();
         var email = $('input[name=email]').val();
+        if($('select[name=calc_shipping_provinces] option:selected').text() != "City"){
+            var city = $('select[name=calc_shipping_provinces] option:selected').text();
+        }else{
+            var city = null;
+        }
+        var district = $('select[name=calc_shipping_district]').val();
         var address = $('input[name=address]').val();
         var tax = $('input[name=tax]').val();
         var bc = $('input[name=bc]').val();
@@ -82,6 +88,8 @@ $(document).ready(function() {
                     "name":name,
                     "phone":phone,
                     "email":email,
+                    "city":city,
+                    "district":district,
                     "address":address,
                     "tax":tax,
                     "bc":bc,
@@ -93,6 +101,8 @@ $(document).ready(function() {
                 $('input[name=name]').val("");
                 $('input[name=phone]').val("");
                 $('input[name=email]').val("");
+                $('select[name=calc_shipping_provinces]').val(null);
+                $('select[name=calc_shipping_district]').val(null);
                 $('input[name=address]').val("");
                 $('input[name=tax]').val("");
                 $('input[name=bc]').val("");
@@ -168,6 +178,8 @@ $(document).ready(function() {
         $('input[name=address]').val("");
         $('input[name=tax]').val("");
         $('input[name=bc]').val("");
+        $('select[name=calc_shipping_provinces]').val(null);
+        $('select[name=calc_shipping_district]').val(null);
         //$("#addRole").modal("hide");
     });
     //key Pressed

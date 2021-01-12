@@ -26,6 +26,7 @@ var authenticateRouter = require("./models/routers/authenticate.router");
 var dashboardRouter = require("./models/routers/dashboard.router");
 var managementRouter = require("./models/routers/management.router");
 var contactRouter = require("./models/routers/contact.router");
+var testRouter = require("./models/routers/test.router");
 
 var app = express();
 var port = 1999;
@@ -51,6 +52,8 @@ app.use('/management/role',managementRouter);
 //'/contact -->contact.router.js------>contact.controller.js
 // Contact contain all the information of personal client and company client
 app.use('/contact',contactRouter);
+//for testing
+app.use('/test',testRouter);
 // for logout
 app.use('/logout',(req,res)=>{
     res.clearCookie("auth_token");

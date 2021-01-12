@@ -5,7 +5,7 @@ head
   meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
   meta(name='description' content='')
   meta(name='author' content='')
-  title Role
+  title Contact
   // Custom fonts for this template
   script(src='http://localhost:1999/dashboard/vendor/jquery/jquery.min.js')
   link(href='http://localhost:1999/dashboard/vendor/fontawesome-free/css/all.min.css' rel='stylesheet' type='text/css')
@@ -310,7 +310,15 @@ body#page-top
             .row
               .col-1
               .col-10.marginhere
-                h5 General
+                h5 General Customer Information
+            .row
+              .col-1
+              .col-3
+                p Code :
+              .col-6
+                .input-group
+                  input(name="code" type="text" style={width:"100%"} placeholder="Customer Code" autocomplete="off")
+              .col-1    
             .row
               .col-1
               .col-3
@@ -330,6 +338,66 @@ body#page-top
                     option(value="2") Company Customer
             .row
               .col-1
+              .col-3
+                p List :
+              .col-6
+                .input-group
+                  input(name="cl" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p Group :
+              .col-6
+                .input-group
+                  input(name="cg" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p BIC :
+              .col-6
+                .input-group
+                  input(name="sc" type="text" style={width:"100%"} placeholder="Swift Code" autocomplete="off")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p Born Date :
+              .col-6
+                .input-group
+                  input(name="dateOfBirth" type="date" style={width:"100%"} placeholder="Date" autocomplete="off")
+              .col-1
+            .row
+              .col-1
+              .col-10.marginhere  
+                h5 Identify Card
+            .row
+              .col-1
+              .col-3
+                p Number :
+              .col-6
+                .input-group
+                  input(name="numberID" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p Date :
+              .col-6
+                .input-group
+                  input(name="dateID" type="date" style={width:"100%"} placeholder="Date Begining" autocomplete="off")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p Place :
+              .col-6
+                .input-group
+                  input(name="place" type="text" style={width:"100%"} placeholder="Place Receiving" autocomplete="off")
+              .col-1
+            .row
+              .col-1
               .col-10.marginhere  
                 h5 Contact
             .row
@@ -343,17 +411,60 @@ body#page-top
             .row
               .col-1
               .col-3
+                p Fax :
+              .col-6
+                .input-group
+                  input(name="fax" type="text" style={width:"100%"} placeholder="Fax" autocomplete="off")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p Postal Code :
+              .col-6
+                .input-group
+                  input(name="pc" type="text" style={width:"100%"} placeholder="Postal Code" autocomplete="off")
+              .col-1  
+            .row
+              .col-1
+              .col-3
                 p Email :
               .col-6
                 .input-group
-                  input(name="email" type="text" style={width:"100%"} placeholder="abcd123@123abc.xyz" autocomplete="off")
+                  input(name="email" type="text" style={width:"100%"} placeholder="name@example.com" autocomplete="off")
+            .row
+              .col-1
+              .col-10.marginhere  
+                h5 Location
+            .row
+              .col-1
+              .col-3
+                p City :
+              .col-6
+                .input-group
+                  select(name='calc_shipping_provinces' required='' style={width:"100%"})
+                    option(value='') City
+            .row
+              .col-1
+              .col-3
+                p District :
+              .col-6
+                .input-group
+                  select(name='calc_shipping_district' required='' style={width:"100%"})
+                    option(value='') District
             .row
               .col-1
               .col-3
                 p Address :
               .col-6
                 .input-group
-                  input(name="address" type="text" style={width:"100%"} placeholder="Street, City" autocomplete="off")
+                  input(name="address" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
+            .row
+              .col-1
+              .col-3
+                p Trading Address :
+              .col-6
+                .input-group
+                  input(name="address" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
             .row
               .col-1
               .col-10.marginhere
@@ -372,6 +483,27 @@ body#page-top
               .col-6
                 .input-group
                   input(name="bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
+            .row
+              .col-1
+              .col-10.marginhere
+                h5 Bank Account
+            .row
+              .col-1
+              .col-3
+                p Number :
+              .col-6
+                .input-group
+                  input(name="bankNumber" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
+              .col-1
+            .row
+              .col-1
+              .col-3
+                p Branch :
+              .col-6
+                .input-group
+                  input(name="branch" type="text" style={width:"100%"} placeholder="Place" autocomplete="off")
+              .col-1
+            
         .modal-footer
           button#cancelAddingRole.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           button#submitAddingRole.btn.btn-primary(type="submit" form="addingRole") Save
@@ -498,6 +630,76 @@ body#page-top
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           a.btn.btn-primary(href='/logout') Logout
   // Bootstrap core JavaScript
+  script(src='https://cdn.jsdelivr.net/gh/vietblogdao/js/districts.min.js')
+  script.
+    if (address_2 = localStorage.getItem('address_2_saved')) {
+      $('select[name="calc_shipping_district"] option').each(function() {
+        if ($(this).text() == address_2) {
+          $(this).attr('selected', '')
+        }
+      })
+      $('input.billing_address_2').attr('value', address_2)
+    }
+    if (district = localStorage.getItem('district')) {
+      $('select[name="calc_shipping_district"]').html(district)
+      $('select[name="calc_shipping_district"]').on('change', function() {
+        var target = $(this).children('option:selected')
+        target.attr('selected', '')
+        $('select[name="calc_shipping_district"] option').not(target).removeAttr('selected')
+        address_2 = target.text()
+        $('input.billing_address_2').attr('value', address_2)
+        district = $('select[name="calc_shipping_district"]').html()
+        localStorage.setItem('district', district)
+        localStorage.setItem('address_2_saved', address_2)
+      })
+    }
+    $('select[name="calc_shipping_provinces"]').each(function() {
+      var $this = $(this),
+        stc = ''
+      c.forEach(function(i, e) {
+        e += +1
+        stc += '<option value=' + e + '>' + i + '</option>'
+        $this.html('<option value="">City</option>' + stc)
+        if (address_1 = localStorage.getItem('address_1_saved')) {
+          $('select[name="calc_shipping_provinces"] option').each(function() {
+            if ($(this).text() == address_1) {
+              $(this).attr('selected', '')
+            }
+          })
+          $('input.billing_address_1').attr('value', address_1)
+        }
+        $this.on('change', function(i) {
+          i = $this.children('option:selected').index() - 1
+          var str = '',
+            r = $this.val()
+          if (r != '') {
+            arr[i].forEach(function(el) {
+              str += '<option value="' + el + '">' + el + '</option>'
+              $('select[name="calc_shipping_district"]').html('<option value="">District</option>' + str)
+            })
+            var address_1 = $this.children('option:selected').text()
+            var district = $('select[name="calc_shipping_district"]').html()
+            //- localStorage.setItem('address_1_saved', address_1)
+            //- localStorage.setItem('district', district)
+            $('select[name="calc_shipping_district"]').on('change', function() {
+              var target = $(this).children('option:selected')
+              target.attr('selected', '')
+              $('select[name="calc_shipping_district"] option').not(target).removeAttr('selected')
+              var address_2 = target.text()
+              $('input.billing_address_2').attr('value', address_2)
+              district = $('select[name="calc_shipping_district"]').html()
+              //- localStorage.setItem('district', district)
+              //- localStorage.setItem('address_2_saved', address_2)
+            })
+          } else {
+            $('select[name="calc_shipping_district"]').html('<option value="">District</option>')
+            district = $('select[name="calc_shipping_district"]').html()
+            //- localStorage.setItem('district', district)
+            //- localStorage.removeItem('address_1_saved', address_1)
+          }
+        })
+      })
+    })
   script(src='http://localhost:1999/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js')
   // Core plugin JavaScript
   script(src='http://localhost:1999/dashboard/vendor/jquery-easing/jquery.easing.min.js')
