@@ -25,7 +25,7 @@ head
     td{
       overflow: hidden !important;
     }
-    .col-3{
+    .col-2{
       text-align:right;
     }
     select{
@@ -36,7 +36,13 @@ head
       border-bottom: 1px solid black !important;
     }
     .marginhere{
-      margin-bottom:15px;
+      margin-bottom:25px;
+    }
+    .floatLeft{
+      float:left;
+    }
+    #cancelAddingRole{
+      margin-right:10px;
     }
 body#page-top
   // Page Wrapper
@@ -303,132 +309,114 @@ body#page-top
       .modal-content
         .modal-header
           h4#exampleModalLabel.modal-title Adding Customer
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
-            span(aria-hidden='true') &times;
+          .floatLeft
+            button#cancelAddingRole.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+            button#submitAddingRole.btn.btn-primary(type="submit" form="addingRole") Save
         .modal-body
           form#addingRole(autocomplete="off")
+            .row
+              .col-12.text-center
+                p Please complete all input had "(<b style="color:red">*</b>)"
             .row
               .col-1
               .col-10.marginhere
                 h5 General Customer Information
             .row
               .col-1
-              .col-3
+              .col-2
                 p Code :
-              .col-6
+              .col-3
                 .input-group
-                  input(name="code" type="text" style={width:"100%"} placeholder="Customer Code" autocomplete="off")
-              .col-1    
+                  input(name="cc" type="text" style={width:"100%"} placeholder="Customer Code" autocomplete="off")
+              .col-2
+                p List :
+              .col-3
+                .input-group
+                  input(name="cl" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
             .row
               .col-1
-              .col-3
+              .col-2
                 p Name (<b style="color:red">*</b>) :
-              .col-6
+              .col-3
                 .input-group
                   input(name="name" type="text" style={width:"100%"} placeholder="Name" autocomplete="off")
-              .col-1
+              .col-2
+                p Group :
+              .col-3
+                .input-group
+                  input(name="cg" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
             .row
               .col-1
-              .col-3
+              .col-2
                 p Type (<b style="color:red">*</b>) :
-              .col-6
+              .col-3
                 .input-group
                   select(name="toc" style={width:"100%"})
                     option(value="1") Personal Customer
                     option(value="2") Company Customer
-            .row
-              .col-1
-              .col-3
-                p List :
-              .col-6
-                .input-group
-                  input(name="cl" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
-              .col-1
-            .row
-              .col-1
-              .col-3
-                p Group :
-              .col-6
-                .input-group
-                  input(name="cg" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
-              .col-1
-            .row
-              .col-1
-              .col-3
+              .col-2
                 p BIC :
-              .col-6
+              .col-3
                 .input-group
                   input(name="sc" type="text" style={width:"100%"} placeholder="Swift Code" autocomplete="off")
-              .col-1
             .row
               .col-1
-              .col-3
+              .col-2
                 p Born Date :
-              .col-6
+              .col-3
                 .input-group
-                  input(name="dateOfBirth" type="date" style={width:"100%"} placeholder="Date" autocomplete="off")
-              .col-1
+                  input(name="dob" type="date" style={width:"100%"} placeholder="Date" autocomplete="off")
+              .col-2
+              .col-3
             .row
               .col-1
               .col-10.marginhere  
                 h5 Identify Card
             .row
               .col-1
-              .col-3
+              .col-2
                 p Number :
-              .col-6
-                .input-group
-                  input(name="numberID" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
-              .col-1
-            .row
-              .col-1
               .col-3
+                .input-group
+                  input(name="numberId" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
+              .col-2
                 p Date :
-              .col-6
+              .col-3
                 .input-group
-                  input(name="dateID" type="date" style={width:"100%"} placeholder="Date Begining" autocomplete="off")
-              .col-1
+                  input(name="dateId" type="date" style={width:"100%"} placeholder="Date Begining" autocomplete="off")
             .row
               .col-1
-              .col-3
+              .col-2
                 p Place :
-              .col-6
+              .col-3
                 .input-group
                   input(name="place" type="text" style={width:"100%"} placeholder="Place Receiving" autocomplete="off")
-              .col-1
             .row
               .col-1
               .col-10.marginhere  
                 h5 Contact
             .row
               .col-1
-              .col-3
+              .col-2
                 p Phone :
-              .col-6
+              .col-3
                 .input-group
                   input(name="phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off" maxlength="10")
-              .col-1
-            .row
-              .col-1
-              .col-3
+              .col-2
                 p Fax :
-              .col-6
+              .col-3
                 .input-group
                   input(name="fax" type="text" style={width:"100%"} placeholder="Fax" autocomplete="off")
-              .col-1
             .row
               .col-1
-              .col-3
+              .col-2
                 p Postal Code :
-              .col-6
+              .col-3
                 .input-group
                   input(name="pc" type="text" style={width:"100%"} placeholder="Postal Code" autocomplete="off")
-              .col-1  
-            .row
-              .col-1
-              .col-3
+              .col-2
                 p Email :
-              .col-6
+              .col-3
                 .input-group
                   input(name="email" type="text" style={width:"100%"} placeholder="name@example.com" autocomplete="off")
             .row
@@ -437,76 +425,59 @@ body#page-top
                 h5 Location
             .row
               .col-1
+              .col-2
+                p City (<b style="color:red">*</b>) :
               .col-3
-                p City :
-              .col-6
                 .input-group
                   select(name='calc_shipping_provinces' required='' style={width:"100%"})
                     option(value='') City
+              .col-2
+                p Address:
+              .col-3
+                .input-group
+                  input(name="address" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
             .row
               .col-1
-              .col-3
+              .col-2
                 p District :
-              .col-6
+              .col-3
                 .input-group
                   select(name='calc_shipping_district' required='' style={width:"100%"})
                     option(value='') District
-            .row
-              .col-1
+              .col-2
+                p Trade Place:
               .col-3
-                p Address :
-              .col-6
                 .input-group
-                  input(name="address" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
-            .row
-              .col-1
-              .col-3
-                p Trading Address :
-              .col-6
-                .input-group
-                  input(name="address" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
+                  input(name="tp" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
             .row
               .col-1
               .col-10.marginhere
-                h5 Taxation
+                h5 Taxation & Bank Account
             .row
               .col-1
-              .col-3
+              .col-2
                 p Tax :
-              .col-6
+              .col-3
                 .input-group
                   input(name="tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off" maxlength="11")
-            .row
-              .col-1
+              .col-2
+                p Bank Number :
               .col-3
-                p Budget Code :
-              .col-6
-                .input-group
-                  input(name="bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
-            .row
-              .col-1
-              .col-10.marginhere
-                h5 Bank Account
-            .row
-              .col-1
-              .col-3
-                p Number :
-              .col-6
                 .input-group
                   input(name="bankNumber" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
-              .col-1
             .row
               .col-1
+              .col-2
+                p Budget Code :
               .col-3
+                .input-group
+                  input(name="bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
+              .col-2
                 p Branch :
-              .col-6
+              .col-3
                 .input-group
                   input(name="branch" type="text" style={width:"100%"} placeholder="Place" autocomplete="off")
-              .col-1
-            
-        .modal-footer
-          button#cancelAddingRole.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          button#submitAddingRole.btn.btn-primary(type="submit" form="addingRole") Save
+          .modal-footer
       // End of Footer
     // End of Content Wrapper
   //modal for edit role

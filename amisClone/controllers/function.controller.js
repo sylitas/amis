@@ -32,7 +32,17 @@ function func_validate(data){
 };
 function func_validate_for_query(data){
     for(var i=0;i<data.length;i++){
-        if(!data[i]){data[i] = null;}
+        if(!data[i]){
+            data[i] = null;
+        }else{
+            var newArr = data[i].split("");
+            for(var j = 0;j<newArr.length;j++){
+                if(newArr[j] == "<" || newArr[j] == ">" || newArr[j] == "="){
+                    newArr[j] = "";
+                }
+            }
+            data[i] = newArr.join("");
+        }
     }
     return data;
 };

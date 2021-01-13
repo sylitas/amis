@@ -78,6 +78,10 @@ $(document).ready(function() {
         var tax = $('input[name=tax]').val();
         var bc = $('input[name=bc]').val();
         var toc = $('select[name=toc]').val();
+        if(!city){
+            alert("Invalid City");
+            return;
+        }
         if(!name){
             alert("Invalid Name");
         }else{
@@ -98,14 +102,14 @@ $(document).ready(function() {
             }).done(function(rs){
                 alert(rs);
                 tableRole.ajax.reload();
-                $('input[name=name]').val("");
-                $('input[name=phone]').val("");
-                $('input[name=email]').val("");
-                $('select[name=calc_shipping_provinces]').val(null);
-                $('select[name=calc_shipping_district]').val(null);
-                $('input[name=address]').val("");
-                $('input[name=tax]').val("");
-                $('input[name=bc]').val("");
+                $("form#addingRole :input[type=text]").each(function(){
+                    var input = $(this);
+                    input.val("");
+                });
+                $("form#addingRole select").each(function(){
+                    var input = $(this);
+                    input.val(null);
+                });
                 $("#addRole").modal("hide");
             })
         }
@@ -172,15 +176,14 @@ $(document).ready(function() {
     });
     //cancel when adding customer
     $("#cancelAddingRole").click(function(){
-        $('input[name=name]').val("");
-        $('input[name=phone]').val("");
-        $('input[name=email]').val("");
-        $('input[name=address]').val("");
-        $('input[name=tax]').val("");
-        $('input[name=bc]').val("");
-        $('select[name=calc_shipping_provinces]').val(null);
-        $('select[name=calc_shipping_district]').val(null);
-        //$("#addRole").modal("hide");
+        $("form#addingRole :input[type=text]").each(function(){
+            var input = $(this);
+            input.val("");
+        });
+        $("form#addingRole select").each(function(){
+            var input = $(this);
+            input.val(null);
+        });
     });
     //key Pressed
     $("html").keyup(function(e){

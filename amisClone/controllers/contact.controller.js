@@ -126,60 +126,114 @@ module.exports.postDeleteDataFromTableClient = (req,res)=>{
 };
 //receive data when submiting
 module.exports.postAddingClientInformation = (req,res)=>{
+/*
+
+--Column----------------Name-----Values-----Status----------
+
+*General Info
+  Code          ->      cc          
+  List          ->      cl              ---Change to Select
+  Name          ->      name            ---DONE
+  Group         ->      cg              ---Change to Select
+  Type          ->      toc             ---DONE
+                        {
+                            1-->Personal Customer
+                            2-->Company Customer
+                        }
+  BIC           ->      sc
+  Born Date     ->      dob
+*Identify Card
+  Number        ->      numberId
+  Date          ->      dateId
+  Place         ->      place
+*Contact
+  Phone         ->      phone           ---DONE
+  Fax           ->      fax             
+  Postal Code   ->      pc              
+  Email         ->      emaiL           ---DONE
+*Location
+  City          ->      city            ---DONE
+  Address       ->      address         ---DONE
+  District      ->      district        ---DONE
+  Trade Place   ->      tp
+*Taxation & Bank Account
+  Tax           ->      tax             ---DONE
+  Bank Number   ->      numberBank
+  Budget Code   ->      bc              ---DONE
+  Branch        ->      branch 
+*/
     isPermission_contact_add(req,function(rs){
         if(rs==true){
             if(req.body.name){
+                //TOKEN for checking and authorize 
                 var token = req.signedCookies.auth_token;
                 var userId = func_lib.decode(token,privateKey).userId;
+                /*--start "General Info" variable receiving-- */
+                var code = req.body.cc;
+                var list = req.body.cl;
                 var name = req.body.name;
-                var phone = req.body.phone;
-                var email = req.body.email;
-                var city = req.body.city;
-                var district = req.body.district;
-                var address = req.body.address;
-                var tax = req.body.tax;
-                var bc = req.body.bc;
+                var group = req.body.cg;
                 if(req.body.toc === "1" || req.body.toc === "2"){
                     var toc = parseInt(req.body.toc);
                 }else{
-                    res.send("Invalid Data");
+                    res.send("Invalid Type");
                     return;
                 }
-                //toc = 1 --> Personal Customer
-                //toc = 2 --> Company Customer
-                var validated = func_lib.func_validate_for_query([name,phone,email,tax,bc]);
-                if(email){
-                    func_lib.func_checkObjectExist(email,function(rs){
-                        if(rs == false){
-                            res.send("Client Existed!");
-                        }else{
-                            Create_Location(city,district,address,(err,locationId)=>{
-                                if(err){
-                                    return;
-                                }else{
-                                    var sql = "INSERT INTO `object`(name,phone,companyEmail,tax,budgetCode,userId,objectType,locationId) VALUES(?,?,?,?,?,?,?,?)";
-                                    conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],userId,toc,locationId],(err)=>{
-                                        if(err) throw err;
-                                        res.send("Added!");
-                                    });
-                                }
-                            });
-                        }
-                    })
-                }else{
-                    //fix later
-                    Create_Location(city,district,address,(err,locationId)=>{
-                        if(err){
-                            return;
-                        }else{
-                            var sql = "INSERT INTO `object`(name,phone,companyEmail,tax,budgetCode,userId,objectType,locationId) VALUES(?,?,?,?,?,?,?,?)";
-                            conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],userId,toc,locationId],(err)=>{
-                                if(err) throw err;
-                                res.send("Added!");
-                            });
-                        }
-                    });
+                var sc = req.body.sc;
+                //--end General data receiving--//
+
+                //--start Identify Card receiving data--//
+                var numberId = req.body.numberId;
+                var dateId = req.body.dateId;
+                var place = req.body.place;
+                //--end Identify Card receiving data--//
+
+                //--start Contact receiving data--//
+                var phone = req.body.phone;
+                var fax = req.body.fax;
+                var pc = req.body.pc;
+                var email = req.body.email;
+                //--end Contact receiving data--//
+
+                //--start Location receiving data--//
+                var city = req.body.city;
+                var address = req.body.address;
+                var district = req.body.district;
+                var tp = req.body.tp;
+                //--end Location receiving data--//
+
+                //--start Taxation & Bank Account receiving data--//
+                var tax = req.body.tax;
+                var numberBank = req.body.numberBank;
+                var bc = req.body.bc;
+                var branch = req.body.branch;
+                //--end Taxation & Bank Account receiving data--//
+                var validated = func_lib.func_validate_for_query(
+                    [
+                        code,list,name,group,sc,
+                        numberId,dateId,place,
+                        phone,fax,pc,email,
+                        address,tp,
+                        tax,numberBank,bc,branch
+                    ]
+                );
+                if(!validated[2]){
+                    res.send("Invalid Name");
+                    return;
                 }
+                Create_Location(city,district,address,(err,locationId)=>{
+                    if(err){
+                        res.send("Invalid Location");
+                        return;
+                    }else{
+                        //fix later
+                        var sql = "INSERT INTO `object`(name,phone,companyEmail,tax,budgetCode,userId,objectType,locationId) VALUES(?,?,?,?,?,?,?,?)";
+                        conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],userId,toc,locationId],(err)=>{
+                            if(err) throw err;
+                            res.send("Added!");
+                        });
+                    }
+                });
             }else{
                 res.send("Invalid Name!");
             }
@@ -379,6 +433,6 @@ function Create_Location(city,district,address,callback){
             });
         });
     }else{
-        return;
+        callback("err",null);
     }
 }
