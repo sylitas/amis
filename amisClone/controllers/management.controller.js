@@ -92,7 +92,7 @@ module.exports.postRole = (req,res)=>{
 };
 module.exports.postUserInRole = (req,res)=>{
     if(req.body.id){var roleId = req.body.id;}else{var roleId = 1}
-    var data = [];
+    //var data = [];
     var dataList = [];
     var draw = req.body.draw;
     var recordsTotal; 

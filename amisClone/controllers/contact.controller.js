@@ -63,47 +63,70 @@ module.exports.postDataForClientTable = (req,res)=>{
         if(err)throw err;
         recordsTotal = rs.length;
         recordsFiltered = rs.length;
-        var sql = 'SELECT * FROM `object` WHERE `userId` = ? AND `name` LIKE "%'+searchStr+'%"';
+        var sql = 'SELECT * FROM `object` WHERE `userId` = ? AND `objectName` LIKE "%'+searchStr+'%"';
         conn.query(sql,[userId],(err,rs)=>{
             if(err)throw err;
             if(searchStr){
                 recordsFiltered = rs.length;
             }
             for(var i = 0;i<rs.length;i++){
-                var id = rs[i].objectId;
-                var name = rs[i].name;
-                var phone = rs[i].phone;
-                var email = rs[i].companyEmail;
-                var address = rs[i].address;
-                var tax = rs[i].tax;
-                var ot = rs[i].objectType;
-                if(ot == 1){
-                    ot = "Personal Customer";
-                }else{
-                    ot = "Company Customer";
-                }
-                var bc = rs[i].budgetCode;
-                var validating = [id,name,phone,email,address,tax,bc];
-                var validated = func_lib.func_validate(validating);
-                var data = {
-                    "id":validated[0],
-                    "name":validated[1],
-                    "phone":validated[2],
-                    "email":validated[3],
-                    "address":validated[4],
-                    "tax":validated[5],
-                    "ot":ot,
-                    "bc":validated[6]
-                }
-                dataList.push(data);
+                var locationId = rs[i].objectId;
+                (function(locationId){
+                    var id = rs[i].objectId;
+                    var name = rs[i].objectName;
+                    var phone = rs[i].objectContact_Phone;
+                    var email = rs[i].objectContact_Email;
+                    var tax = rs[i].objectTaxation_Tax;
+                    var ot = rs[i].objectType;if(ot == 1){ot = "Personal Customer";}else{ot = "Company Customer";}
+                    var bc = rs[i].objectTaxation_BudgetCode;
+                    //location
+                    var location;
+                    conn.query( "CALL Proc_SelectCityOfObjectFromLocation(?)",[locationId],(err,rs)=>{
+                        if(err)throw err;
+                        rs = rs[0];
+                        var city = rs[0].cityName;
+                        var address = rs[0].address;
+                        var district = rs[0].districtId;
+                        var sql = "SELECT `districtName` FROM `district` WHERE districtId = ?";
+                        conn.query(sql,[district],(err,rs)=>{
+                            console.log("Here")
+                            if(err) throw err;
+                            if(rs.length>0){
+                                if(address){location = address +", "+rs[0].districtName+", "+city;}else{location = district+", "+city;}
+                                var validating = [id,name,phone,email,tax,bc];
+                                var validated = func_lib.func_validate(validating);
+                                var data = {
+                                    "id":validated[0],
+                                    "name":validated[1],
+                                    "phone":validated[2],
+                                    "email":validated[3],
+                                    "location":location,
+                                    "tax":validated[4],
+                                    "ot":ot,
+                                    "bc":validated[5]
+                                }
+                                dataList.push(data);
+                            }else{
+                                if(!address){location = city;}else{location = address +", "+ city;}
+                                var validating = [id,name,phone,email,tax,bc];
+                                var validated = func_lib.func_validate(validating);
+                                var data = {
+                                    "id":validated[0],
+                                    "name":validated[1],
+                                    "phone":validated[2],
+                                    "email":validated[3],
+                                    "location":location,
+                                    "tax":validated[4],
+                                    "ot":ot,
+                                    "bc":validated[5]
+                                }
+                                dataList.push(data);
+                            }
+                            console.log(dataList);
+                        });
+                    });
+                })(locationId);
             }
-            var dataSend = {
-                "draw":draw,
-                "recordsTotal":recordsTotal,
-                "recordsFiltered":recordsFiltered,
-                "data":dataList
-            }
-            res.send(dataSend);
         });
     });
 };
@@ -128,12 +151,12 @@ module.exports.postDeleteDataFromTableClient = (req,res)=>{
 module.exports.postAddingClientInformation = (req,res)=>{
 /*
 
---Column----------------Name-----Values-----Status----------
+--Column----------------Name-----D.Values-----Status------
 
 *General Info
-  Code          ->      cc          
-  List          ->      cl              ---Change to Select
-  Name          ->      name            ---DONE
+  Code          ->      cc                                      
+  List          ->      cl              ---Change to Select 
+  Name          ->      name            ---DONE                 
   Group         ->      cg              ---Change to Select
   Type          ->      toc             ---DONE
                         {
@@ -164,78 +187,102 @@ module.exports.postAddingClientInformation = (req,res)=>{
 */
     isPermission_contact_add(req,function(rs){
         if(rs==true){
-            if(req.body.name){
+            if(req.body.data){
                 //TOKEN for checking and authorize 
                 var token = req.signedCookies.auth_token;
                 var userId = func_lib.decode(token,privateKey).userId;
+                var data = req.body.data;
                 /*--start "General Info" variable receiving-- */
-                var code = req.body.cc;
-                var list = req.body.cl;
-                var name = req.body.name;
-                var group = req.body.cg;
-                if(req.body.toc === "1" || req.body.toc === "2"){
-                    var toc = parseInt(req.body.toc);
+                var code = data[0].value;
+                var list = data[1].value;
+                var name = data[2].value;
+                var group = data[3].value;
+                if(data[4].value === "1" || data[4].value === "2"){
+                    var toc = parseInt(data[4].value);
                 }else{
                     res.send("Invalid Type");
                     return;
                 }
-                var sc = req.body.sc;
+                var sc = data[5].value;
+                var dob = data[6].value;
                 //--end General data receiving--//
 
                 //--start Identify Card receiving data--//
-                var numberId = req.body.numberId;
-                var dateId = req.body.dateId;
-                var place = req.body.place;
+                var numberId = data[7].value;
+                var dateId = data[8].value;
+                var place = data[9].value;
                 //--end Identify Card receiving data--//
 
                 //--start Contact receiving data--//
-                var phone = req.body.phone;
-                var fax = req.body.fax;
-                var pc = req.body.pc;
-                var email = req.body.email;
+                var phone = data[10].value;
+                var fax = data[11].value;
+                var pc = data[12].value;
+                var email = data[13].value;
                 //--end Contact receiving data--//
 
                 //--start Location receiving data--//
-                var city = req.body.city;
-                var address = req.body.address;
-                var district = req.body.district;
-                var tp = req.body.tp;
+                var city = data[14].value;
+                var address = data[15].value;
+                var district = data[16].value;
+                var tp = data[17].value;
                 //--end Location receiving data--//
 
                 //--start Taxation & Bank Account receiving data--//
-                var tax = req.body.tax;
-                var numberBank = req.body.numberBank;
-                var bc = req.body.bc;
-                var branch = req.body.branch;
+                var tax = data[18].value;
+                var numberBank = data[19].value;
+                var bc = data[20].value;
+                var branch = data[21].value;
                 //--end Taxation & Bank Account receiving data--//
                 var validated = func_lib.func_validate_for_query(
-                    [
+                    [   
                         code,list,name,group,sc,
                         numberId,dateId,place,
                         phone,fax,pc,email,
                         address,tp,
-                        tax,numberBank,bc,branch
+                        tax,bc,
+                        numberBank,branch
                     ]
                 );
+                if(!dob){
+                    dob=null;
+                }
                 if(!validated[2]){
                     res.send("Invalid Name");
                     return;
                 }
-                Create_Location(city,district,address,(err,locationId)=>{
-                    if(err){
-                        res.send("Invalid Location");
-                        return;
-                    }else{
-                        //fix later
-                        var sql = "INSERT INTO `object`(name,phone,companyEmail,tax,budgetCode,userId,objectType,locationId) VALUES(?,?,?,?,?,?,?,?)";
-                        conn.query(sql,[validated[0],validated[1],validated[2],validated[3],validated[4],userId,toc,locationId],(err)=>{
-                            if(err) throw err;
-                            res.send("Added!");
-                        });
-                    }
+                if(!city){
+                    res.send("Invalid City");
+                    return;
+                }
+                if(!validated[12]){
+                    address=null;
+                }     
+                Create_Location(city,district,address);
+                //Insert all values except "list" and "group"
+                var sql = 
+                "INSERT INTO `object`(\
+                    userId,\
+                    objectCode, objectType, objectName, objectBirthday, objectSwiftCode,\
+                    objectIdCard_Number ,objectIDCard_Date, objectIDCard_Place,\
+                    objectContact_Phone, objectContact_Fax, objectContact_PostalCode, objectContact_Email,\
+                    objectLocation_TradePlace,\
+                    objectTaxation_Tax, objectTaxation_BudgetCode,\
+                    objectBank_AccountNumber, objectBank_Branch) \
+                VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                conn.query(sql,[
+                    userId,
+                    validated[0],toc,validated[2],dob,validated[4],
+                    validated[5],validated[6],validated[7],
+                    validated[8],validated[9],validated[10],validated[11],
+                    validated[13],
+                    validated[15],validated[16],
+                    validated[17],validated[18]
+                ],(err)=>{
+                    if(err) throw err;
+                    res.send("Added!");
                 });
             }else{
-                res.send("Invalid Name!");
+                res.send("Invalid Data");
             }
         }else{
             res.send("Don't have permission !");
@@ -372,67 +419,46 @@ function isPermission_contact_edit(req,callback){
         }
     });
 };
-function Create_Location(city,district,address,callback){
-    if(!address){address=null;}
-    if(city){
-        var sql = "SELECT `cityName` FROM `city` WHERE cityName = ?";
+function Create_Location(city,district,address){
+    var sql = "SELECT `cityName` FROM `city` WHERE cityName = ?";
+    conn.query(sql,[city],(err,rs)=>{
+        if(err) throw err;
+        if(rs.length==0){
+            var sql = "INSERT INTO `city`(cityName) VALUES (?)";
+            conn.query(sql,[city],(err)=>{
+                if(err) throw err;
+            });
+        }
+        var sql = "SELECT `cityId` FROM `city` WHERE cityName = ?";
         conn.query(sql,[city],(err,rs)=>{
             if(err) throw err;
-            if(rs.length==0){
-                var sql = "INSERT INTO `city`(cityName) VALUES (?)";
-                conn.query(sql,[city],(err)=>{
+            var cityId = rs[0].cityId
+            if(district){
+                var sql = "SELECT `districtName` FROM `district` WHERE districtName = ?";
+                conn.query(sql,[district],(err,rs)=>{
                     if(err) throw err;
-                });
-            }
-            var sql = "SELECT `cityId` FROM `city` WHERE cityName = ?";
-            conn.query(sql,[city],(err,rs)=>{
-                if(err) throw err;
-                var cityId = rs[0].cityId
-                if(district){
-                    var sql = "SELECT `districtName` FROM `district` WHERE districtName = ?";
-                    conn.query(sql,[district],(err,rs)=>{
-                        if(err) throw err;
-                        if(rs.length==0){
-                            var sql = "INSERT INTO `district`(cityId,districtName) VALUES (?,?)";
-                            conn.query(sql,[cityId,district],(err)=>{
-                                if(err) throw err;
-                            });
-                        }
-                        var sql = "SELECT `districtId` FROM `district` WHERE `districtName` = ? AND cityId = ?";
-                        conn.query(sql,[district,cityId],(err,rs)=>{
+                    if(rs.length==0){
+                        var sql = "INSERT INTO `district`(cityId,districtName) VALUES (?,?)";
+                        conn.query(sql,[cityId,district],(err)=>{
                             if(err) throw err;
-                            var districtId = rs[0].districtId;
-                            var sql = "INSERT INTO `location`(cityId,districtId,address) VALUES(?,?,?)";
-                            conn.query(sql,[cityId,districtId,address],(err)=>{
-                                if(err)throw err;
-                            });
-                            var sql = "SELECT `locationId` FROM `location` WHERE cityId = ?";
-                            conn.query(sql,[cityId],(err,rs)=>{
-                                if(err){
-                                    callback(err,null);
-                                }else{
-                                    callback(null,rs[0].locationId);
-                                }
-                            });
+                        });
+                    }
+                    var sql = "SELECT `districtId` FROM `district` WHERE `districtName` = ? AND cityId = ?";
+                    conn.query(sql,[district,cityId],(err,rs)=>{
+                        if(err) throw err;
+                        var districtId = rs[0].districtId;
+                        var sql = "INSERT INTO `location`(cityId,districtId,address) VALUES(?,?,?)";
+                        conn.query(sql,[cityId,districtId,address],(err)=>{
+                            if(err)throw err;
                         });
                     });
-                }else{
-                    var sql = "INSERT INTO `location`(cityId,address) VALUES(?,?)";
-                    conn.query(sql,[cityId,address],(err)=>{
-                        if(err)throw err;
-                    });
-                    var sql = "SELECT `locationId` FROM `location` WHERE cityId = ?";
-                    conn.query(sql,[cityId],(err,rs)=>{
-                        if(err){
-                            callback(err,null);
-                        }else{
-                            callback(null,rs[0].locationId);
-                        }
-                    });
-                }
-            });
+                });
+            }else{
+                var sql = "INSERT INTO `location`(cityId,address) VALUES(?,?)";
+                conn.query(sql,[cityId,address],(err)=>{
+                    if(err)throw err;
+                });
+            }
         });
-    }else{
-        callback("err",null);
-    }
-}
+    });
+};

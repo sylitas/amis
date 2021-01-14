@@ -17,21 +17,20 @@ $(document).ready(function() {
             {"data": "name"}, 
             {"data": "phone"},
             {"data": "email"},
-            {"data": "address"},
             {"data": "tax"},
             {"data": "ot"},
             {"data": "bc"}
         ],
         "createdRow":function(row,data,dataIndex,cells){
             if(data.id == 1){
-            $(row).addClass( 'table-primary' );
+                $(row).addClass( 'table-primary' );
             }
         },
         "rowId": function(a) {
             return a.id;
         },
         "language": {
-            searchPlaceholder: "Search Client"
+            searchPlaceholder: "Search Client Name"
         }
     });
     //row of datatable clicked
@@ -65,39 +64,24 @@ $(document).ready(function() {
     //submit adding new customer
     $("#submitAddingRole").click(function(e){
         e.preventDefault();
-        var name = $('input[name=name]').val();
-        var phone = $('input[name=phone]').val();
-        var email = $('input[name=email]').val();
+        var data = $("#addingRole").serializeArray();
         if($('select[name=calc_shipping_provinces] option:selected').text() != "City"){
-            var city = $('select[name=calc_shipping_provinces] option:selected').text();
+            data[14].value = $('select[name=calc_shipping_provinces] option:selected').text();
         }else{
-            var city = null;
+            data[14].value = '';
         }
-        var district = $('select[name=calc_shipping_district]').val();
-        var address = $('input[name=address]').val();
-        var tax = $('input[name=tax]').val();
-        var bc = $('input[name=bc]').val();
-        var toc = $('select[name=toc]').val();
-        if(!city){
-            alert("Invalid City");
+        if(!data[14].value){
+            alert("Please Choose The Location");
             return;
         }
-        if(!name){
-            alert("Invalid Name");
+        if(!data[2].value){
+            alert('Missing Fill "Name"');
         }else{
             $.ajax({
                 method:"POST",
                 url:"http://localhost:1999/contact/postAddingClientInformation",
                 data:{
-                    "name":name,
-                    "phone":phone,
-                    "email":email,
-                    "city":city,
-                    "district":district,
-                    "address":address,
-                    "tax":tax,
-                    "bc":bc,
-                    "toc":toc
+                    "data":data
                 }
             }).done(function(rs){
                 alert(rs);
