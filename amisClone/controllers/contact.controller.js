@@ -1,10 +1,10 @@
 var jwt = require("jsonwebtoken");
+var dateFormat = require("dateformat");
 
 var func_lib = require("./function.controller");
 var conn = require("../database/main.database");
 var db = require("../database/sqlite.database");
 var privateKey = process.env.KEY;
-
 module.exports.getContactPage = (req,res)=>{
     if(req.signedCookies.auth_token){
         var token = req.signedCookies.auth_token;
@@ -53,7 +53,6 @@ module.exports.getContactPage = (req,res)=>{
 module.exports.postDataForClientTable = (req,res)=>{
     var token = req.signedCookies.auth_token;
     var userId = func_lib.decode(token,privateKey).userId;
-    var dataList = [];
     var draw = req.body.draw;
     var recordsTotal; 
     var recordsFiltered;
@@ -69,9 +68,10 @@ module.exports.postDataForClientTable = (req,res)=>{
             if(searchStr){
                 recordsFiltered = rs.length;
             }
-            for(var i = 0;i<rs.length;i++){
-                var locationId = rs[i].objectId;
-                (function(locationId){
+            let dataList = [];
+            if(rs.length>0){
+                for(let i = 0;i<rs.length;i++){
+                    var locationId = rs[i].objectId;
                     var id = rs[i].objectId;
                     var name = rs[i].objectName;
                     var phone = rs[i].objectContact_Phone;
@@ -79,53 +79,28 @@ module.exports.postDataForClientTable = (req,res)=>{
                     var tax = rs[i].objectTaxation_Tax;
                     var ot = rs[i].objectType;if(ot == 1){ot = "Personal Customer";}else{ot = "Company Customer";}
                     var bc = rs[i].objectTaxation_BudgetCode;
-                    //location
-                    var location;
-                    conn.query( "CALL Proc_SelectCityOfObjectFromLocation(?)",[locationId],(err,rs)=>{
-                        if(err)throw err;
-                        rs = rs[0];
-                        var city = rs[0].cityName;
-                        var address = rs[0].address;
-                        var district = rs[0].districtId;
-                        var sql = "SELECT `districtName` FROM `district` WHERE districtId = ?";
-                        conn.query(sql,[district],(err,rs)=>{
-                            console.log("Here")
-                            if(err) throw err;
-                            if(rs.length>0){
-                                if(address){location = address +", "+rs[0].districtName+", "+city;}else{location = district+", "+city;}
-                                var validating = [id,name,phone,email,tax,bc];
-                                var validated = func_lib.func_validate(validating);
-                                var data = {
-                                    "id":validated[0],
-                                    "name":validated[1],
-                                    "phone":validated[2],
-                                    "email":validated[3],
-                                    "location":location,
-                                    "tax":validated[4],
-                                    "ot":ot,
-                                    "bc":validated[5]
-                                }
-                                dataList.push(data);
-                            }else{
-                                if(!address){location = city;}else{location = address +", "+ city;}
-                                var validating = [id,name,phone,email,tax,bc];
-                                var validated = func_lib.func_validate(validating);
-                                var data = {
-                                    "id":validated[0],
-                                    "name":validated[1],
-                                    "phone":validated[2],
-                                    "email":validated[3],
-                                    "location":location,
-                                    "tax":validated[4],
-                                    "ot":ot,
-                                    "bc":validated[5]
-                                }
-                                dataList.push(data);
+                    
+                    Get_data(locationId,id,name,phone,email,tax,ot,bc,(data)=>{
+                        dataList.push(data);
+                        if(i==rs.length-1){
+                            var dataSend = {
+                                "data":dataList,
+                                "draw":draw,
+                                "recordsTotal":recordsTotal,
+                                "recordsFiltered":recordsFiltered
                             }
-                            console.log(dataList);
-                        });
-                    });
-                })(locationId);
+                            res.send(dataSend);
+                        }
+                    })
+                }   
+            }else{
+                var dataSend = {
+                    "data":dataList,
+                    "draw":draw,
+                    "recordsTotal":recordsTotal,
+                    "recordsFiltered":recordsFiltered
+                }
+                res.send(dataSend)
             }
         });
     });
@@ -297,25 +272,90 @@ module.exports.postDataForEdit = (req,res)=>{
                 var sql = "SELECT * FROM `object` WHERE objectId = ?";
                 conn.query(sql,[req.body.id],(err,rs)=>{
                     if(err) throw err;
-                    var name = rs[0].name;
-                    var phone = rs[0].phone;
-                    var email = rs[0].email;
-                    var address = rs[0].address;
-                    var tax = rs[0].tax;
-                    var bc = rs[0].budgetCode;
-                    var toc = rs[0].objectType;
-    
-                    var data = func_lib.func_validate_for_edit([name,phone,email,address,tax,bc]);
-                    var dataSend = {
-                        "name":data[0],
-                        "phone":data[1],
-                        "email":data[2],
-                        "address":data[3],
-                        "tax":data[4],
-                        "bc":data[5],
-                        "toc":toc
+                    if(rs.length>0){
+                        var locationId = req.body.id;
+                        /*--start "General Info" variable receiving-- */
+                        var code = rs[0].objectCode;
+                        var list = "";
+                        var name = rs[0].objectName;
+                        var group = "";
+                        var toc = rs[0].objectType;
+                        var sc = rs[0].objectSwiftCode;
+                        if(rs[0].objectBirthday != null){
+                            var dob = dateFormat(rs[0].objectBirthday,"yyyy-mm-d");
+                        }else{
+                            var dob = null;
+                        }
+                        //--end General data receiving--//
+
+                        //--start Identify Card receiving data--//
+                        var numberId = rs[0].objectIDCard_Number;
+                        if(rs[0].objectIDCard_Date != null){
+                            var dateId = dateFormat(rs[0].objectIDCard_Date,"yyyy-mm-d");
+                        }else{
+                            var dateId = null;
+                        }
+                        var place = rs[0].objectIDCard_Place;
+                        //--end Identify Card receiving data--//
+
+                        //--start Contact receiving data--//
+                        var phone = rs[0].objectContact_Phone;
+                        var fax = rs[0].objectContact_Fax;
+                        var pc = rs[0].objectContact_PostalCode;
+                        var email = rs[0].objectContact_Email;
+                        //--end Contact receiving data--//
+
+                        //--start Location receiving data--//
+                        // var city = rs[0].;
+                        //var address = rs[0].;
+                        // var district = rs[0].;
+                        var tp = rs[0].objectLocation_TradePlace;
+                        //--end Location receiving data--//
+
+                        //--start Taxation & Bank Account receiving data--//
+                        var tax = rs[0].objectTaxation_Tax;
+                        var numberBank = rs[0].objectBank_AccountNumber;
+                        var bc = rs[0].objectTaxation_BudgetCode;
+                        var branch = rs[0].objectBank_AccountNumber;
+                        //--end Taxation & Bank Account receiving data--//
+
+                        var validated = func_lib.func_validate_for_edit(
+                            [   
+                                code,list,name,group,sc,
+                                numberId,dateId,place,
+                                phone,fax,pc,email,
+                                tp,
+                                tax,bc,
+                                numberBank,branch
+                            ]
+                        );
+                        conn.query( "CALL Proc_SelectCityOfObjectFromLocation(?)",[locationId],(err,rs)=>{
+                            if(err)throw err;
+                            rs = rs[0];
+                            var city = rs[0].cityName;
+                            var address = rs[0].address;
+                            var districtId = rs[0].districtId;
+                            var sql = "SELECT `districtName` FROM `district` WHERE districtId = ?";
+                            conn.query(sql,[districtId],(err,rs)=>{
+                                if(err) throw err;
+                                if(rs.length>0){
+                                    var district = rs[0].districtName;
+                                }else{
+                                    var district = null;
+                                }
+                                var data = {
+                                    "code":validated[0],"list":validated[1],"name":validated[2],"group":validated[3],"toc":toc,"sc":validated[4],"dob":dob,
+                                    "numberId":validated[5],"dateId":validated[6],"place":validated[7],
+                                    "phone":validated[8],"fax":validated[9],"pc":validated[10],"email":validated[11],
+                                    "city":city,"address":address,"district":district,"tp":validated[12],
+                                    "tax":validated[13],"bc":validated[14],
+                                    "numberBank":validated[15],"branch":validated[16]
+                                }
+                                res.send(data);
+                            });
+                        });
+                        
                     }
-                    res.send(dataSend);
                 });
             }else{
                 res.send("err")
@@ -460,5 +500,43 @@ function Create_Location(city,district,address){
                 });
             }
         });
+    });
+};
+function Get_Location(locationId,callback){
+    var location;
+    conn.query( "CALL Proc_SelectCityOfObjectFromLocation(?)",[locationId],(err,rs)=>{
+        if(err)throw err;
+        rs = rs[0];
+        var city = rs[0].cityName;
+        var address = rs[0].address;
+        var district = rs[0].districtId;
+        var sql = "SELECT `districtName` FROM `district` WHERE districtId = ?";
+        conn.query(sql,[district],(err,rs)=>{
+            if(err) throw err;
+            if(rs.length>0){
+                if(address){location = address +", "+rs[0].districtName+", "+city;}else{location = rs[0].districtName+", "+city;}
+                callback(location);
+            }else{
+                if(!address){location = city;}else{location = address +", "+ city;}
+                callback(location);
+            }
+        });
+    });
+};
+function Get_data(locationId,id,name,phone,email,tax,ot,bc,callback){
+    Get_Location(locationId,(location)=>{
+        var validating = [id,name,phone,email,tax,bc];
+        var validated = func_lib.func_validate(validating);
+        let data = {
+            "id":validated[0],
+            "name":validated[1],
+            "phone":validated[2],
+            "email":validated[3],
+            "location":location,
+            "tax":validated[4],
+            "ot":ot,
+            "bc":validated[5]
+        }
+        callback(data);
     });
 };

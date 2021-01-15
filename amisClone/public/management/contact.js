@@ -17,6 +17,7 @@ $(document).ready(function() {
             {"data": "name"}, 
             {"data": "phone"},
             {"data": "email"},
+            {"data":"location"},
             {"data": "tax"},
             {"data": "ot"},
             {"data": "bc"}
@@ -32,6 +33,10 @@ $(document).ready(function() {
         "language": {
             searchPlaceholder: "Search Client Name"
         }
+    });
+    //click addRole
+    $('#addRole').click(function(){
+        $('select[name=toc]').val(1);
     });
     //row of datatable clicked
     $("#dataTable-Role").on('click','tr',function(){
@@ -118,13 +123,28 @@ $(document).ready(function() {
                 alert("No Permission!");
                 $("#editer").modal("hide");
             }else{
-                $('input[name=edit_name]').val(rs.name);
-                $('select[name=edit_toc]').val(rs.toc);
-                $('input[name=edit_phone]').val(rs.phone);
-                $('input[name=edit_email]').val(rs.email);
-                $('input[name=edit_address]').val(rs.address);
-                $('input[name=edit_tax]').val(rs.tax);
-                $('input[name=edit_bc]').val(rs.bc);
+                $("#editForm input[name=cc]").val(rs.code);
+                $("#editForm input[name=cl]").val(rs.list);
+                $("#editForm input[name=name]").val(rs.name);
+                $("#editForm input[name=cg]").val(rs.group);
+                $("#editForm input[name=toc]").val(rs.toc);
+                $("#editForm input[name=sc]").val(rs.sc);
+                $("#editForm input[name=dob]").val(rs.dob);
+                $("#editForm input[name=numberId]").val(rs.numberId);
+                $("#editForm input[name=dateId]").val(rs.dateId);
+                $("#editForm input[name=place]").val(rs.place);
+                $("#editForm input[name=phone]").val(rs.phone);
+                $("#editForm input[name=fax]").val(rs.fax);
+                $("#editForm input[name=pc]").val(rs.pc);
+                $("#editForm input[name=email]").val(rs.email);
+                $("#editForm select[name=calc_shipping_provinces]").val(rs.city);
+                $("#editForm select[name=calc_shipping_district]").val(rs.district);
+                $("#editForm input[name=address]").val(rs.address);
+                $("#editForm input[name=tp]").val(rs.tp);
+                $("#editForm input[name=tax]").val(rs.tax);
+                $("#editForm input[name=numberBank]").val(rs.numberBank);
+                $("#editForm input[name=bc]").val(rs.bc);
+                $("#editForm input[name=branch]").val(rs.branch);
             }
         });
     });

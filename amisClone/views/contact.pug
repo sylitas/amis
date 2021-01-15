@@ -44,6 +44,10 @@ head
     #cancelAddingRole{
       margin-right:10px;
     }
+    #cancelEditingRole{
+      margin-right:10px;
+    }
+    
 body#page-top
   // Page Wrapper
   #wrapper
@@ -293,6 +297,7 @@ body#page-top
                       th Name
                       th Phone
                       th Email
+                      th Address
                       th Tax
                       th Type of Client
                       th Budget Code
@@ -484,80 +489,176 @@ body#page-top
     .modal-dialog-centered(role='document')
       .modal-content
         .modal-header
-          h5#exampleModalLabel.modal-title Role Editer
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
-            span(aria-hidden='true') &times;
+          h4#exampleModalLabel.modal-title Adding Customer
+          .floatLeft
+            button#cancelEditingRole.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+            button#submitEditingRole.btn.btn-primary(type="submit" form="editForm") Save
         .modal-body
-          form#editerr(autocomplete="off")
+          form#editForm(autocomplete="off")
+            .row
+              .col-12.text-center
+                p Please complete all input had "(<b style="color:red">*</b>)"
             .row
               .col-1
               .col-10.marginhere
-                h5 General
+                h5 General Customer Information
             .row
               .col-1
+              .col-2
+                p Code :
               .col-3
+                .input-group
+                  input(name="cc" type="text" style={width:"100%"} placeholder="Customer Code" autocomplete="off")
+              .col-2
+                p List :
+              .col-3
+                .input-group
+                  input(name="cl" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
+            .row
+              .col-1
+              .col-2
                 p Name (<b style="color:red">*</b>) :
-              .col-6
+              .col-3
                 .input-group
-                  input(name="edit_name" type="text" style={width:"100%"} placeholder="Name" autocomplete="off")
-              .col-1
+                  input(name="name" type="text" style={width:"100%"} placeholder="Name" autocomplete="off")
+              .col-2
+                p Group :
+              .col-3
+                .input-group
+                  input(name="cg" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
             .row
               .col-1
-              .col-3
+              .col-2
                 p Type (<b style="color:red">*</b>) :
-              .col-6
+              .col-3
                 .input-group
-                  select(name="edit_toc" style={width:"100%"})
+                  select(name="toc" style={width:"100%"})
                     option(value="1") Personal Customer
                     option(value="2") Company Customer
+              .col-2
+                p BIC :
+              .col-3
+                .input-group
+                  input(name="sc" type="text" style={width:"100%"} placeholder="Swift Code" autocomplete="off")
             .row
               .col-1
-              .col-10.marginhere
+              .col-2
+                p Born Date :
+              .col-3
+                .input-group
+                  input(name="dob" type="date" style={width:"100%"} placeholder="Date" autocomplete="off")
+              .col-2
+              .col-3
+            .row
+              .col-1
+              .col-10.marginhere  
+                h5 Identify Card
+            .row
+              .col-1
+              .col-2
+                p Number :
+              .col-3
+                .input-group
+                  input(name="numberId" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
+              .col-2
+                p Date :
+              .col-3
+                .input-group
+                  input(name="dateId" type="date" style={width:"100%"} placeholder="Date Begining" autocomplete="off")
+            .row
+              .col-1
+              .col-2
+                p Place :
+              .col-3
+                .input-group
+                  input(name="place" type="text" style={width:"100%"} placeholder="Place Receiving" autocomplete="off")
+            .row
+              .col-1
+              .col-10.marginhere  
                 h5 Contact
             .row
               .col-1
-              .col-3
+              .col-2
                 p Phone :
-              .col-6
+              .col-3
                 .input-group
-                  input(name="edit_phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off" maxlength="10")
-              .col-1
+                  input(name="phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off" maxlength="10")
+              .col-2
+                p Fax :
+              .col-3
+                .input-group
+                  input(name="fax" type="text" style={width:"100%"} placeholder="Fax" autocomplete="off")
             .row
               .col-1
+              .col-2
+                p Postal Code :
               .col-3
+                .input-group
+                  input(name="pc" type="text" style={width:"100%"} placeholder="Postal Code" autocomplete="off")
+              .col-2
                 p Email :
-              .col-6
+              .col-3
                 .input-group
-                  input(name="edit_email" type="text" style={width:"100%"} placeholder="abcd123@123abc.xyz" autocomplete="off")
+                  input(name="email" type="text" style={width:"100%"} placeholder="name@example.com" autocomplete="off")
             .row
               .col-1
+              .col-10.marginhere  
+                h5 Location
+            .row
+              .col-1
+              .col-2
+                p City (<b style="color:red">*</b>) :
               .col-3
-                p Address :
-              .col-6
                 .input-group
-                  input(name="edit_address" type="text" style={width:"100%"} placeholder="Street, City" autocomplete="off")
+                  select(name='calc_shipping_provinces' required='' style={width:"100%"})
+                    option(value='') City
+              .col-2
+                p Address:
+              .col-3
+                .input-group
+                  input(name="address" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
+            .row
+              .col-1
+              .col-2
+                p District :
+              .col-3
+                .input-group
+                  select(name='calc_shipping_district' required='' style={width:"100%"})
+                    option(value='') District
+              .col-2
+                p Trade Place:
+              .col-3
+                .input-group
+                  input(name="tp" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
             .row
               .col-1
               .col-10.marginhere
-                h5 Taxation
+                h5 Taxation & Bank Account
             .row
               .col-1
-              .col-3
+              .col-2
                 p Tax :
-              .col-6
+              .col-3
                 .input-group
-                  input(name="edit_tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off" maxlength="11")
+                  input(name="tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off" maxlength="11")
+              .col-2
+                p Bank Number :
+              .col-3
+                .input-group
+                  input(name="bankNumber" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
             .row
               .col-1
-              .col-3
+              .col-2
                 p Budget Code :
-              .col-6
+              .col-3
                 .input-group
-                  input(name="edit_bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
-                  
-        .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          button#submitEditingRole.btn.btn-primary(type="submit" form="editerr") Save
+                  input(name="bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
+              .col-2
+                p Branch :
+              .col-3
+                .input-group
+                  input(name="branch" type="text" style={width:"100%"} placeholder="Place" autocomplete="off")
+          .modal-footer
   //modal for add new user
   #addUser.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
     .modal-dialog-centered#widther(role='document')
@@ -626,9 +727,8 @@ body#page-top
     $('select[name="calc_shipping_provinces"]').each(function() {
       var $this = $(this),
         stc = ''
-      c.forEach(function(i, e) {
-        e += +1
-        stc += '<option value=' + e + '>' + i + '</option>'
+      c.forEach(function(i) {
+        stc += '<option value="' + i + '">' + i + '</option>'
         $this.html('<option value="">City</option>' + stc)
         if (address_1 = localStorage.getItem('address_1_saved')) {
           $('select[name="calc_shipping_provinces"] option').each(function() {
@@ -649,8 +749,8 @@ body#page-top
             })
             var address_1 = $this.children('option:selected').text()
             var district = $('select[name="calc_shipping_district"]').html()
-            //- localStorage.setItem('address_1_saved', address_1)
-            //- localStorage.setItem('district', district)
+            localStorage.setItem('address_1_saved', address_1)
+            localStorage.setItem('district', district)
             $('select[name="calc_shipping_district"]').on('change', function() {
               var target = $(this).children('option:selected')
               target.attr('selected', '')
@@ -658,14 +758,14 @@ body#page-top
               var address_2 = target.text()
               $('input.billing_address_2').attr('value', address_2)
               district = $('select[name="calc_shipping_district"]').html()
-              //- localStorage.setItem('district', district)
-              //- localStorage.setItem('address_2_saved', address_2)
+              localStorage.setItem('district', district)
+              localStorage.setItem('address_2_saved', address_2)
             })
           } else {
             $('select[name="calc_shipping_district"]').html('<option value="">District</option>')
             district = $('select[name="calc_shipping_district"]').html()
-            //- localStorage.setItem('district', district)
-            //- localStorage.removeItem('address_1_saved', address_1)
+            localStorage.setItem('district', district)
+            localStorage.removeItem('address_1_saved', address_1)
           }
         })
       })
