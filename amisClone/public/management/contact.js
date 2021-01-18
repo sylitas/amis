@@ -36,6 +36,7 @@ $(document).ready(function() {
     });
     //click addRole
     $('#addRole').click(function(){
+        $("#editForm select[name=calc_shipping_provinces]").val(null);
         $('select[name=toc]').val(1);
     });
     //row of datatable clicked
@@ -138,6 +139,7 @@ $(document).ready(function() {
                 $("#editForm input[name=pc]").val(rs.pc);
                 $("#editForm input[name=email]").val(rs.email);
                 $("#editForm select[name=calc_shipping_provinces]").val(rs.city);
+                $("#editForm select[name=calc_shipping_provinces]").change();
                 $("#editForm select[name=calc_shipping_district]").val(rs.district);
                 $("#editForm input[name=address]").val(rs.address);
                 $("#editForm input[name=tp]").val(rs.tp);
@@ -151,32 +153,40 @@ $(document).ready(function() {
     //submit editing
     $("#submitEditingRole").click(function(e){
         e.preventDefault();
-        var name = $('input[name=edit_name]').val();
-        var phone = $('input[name=edit_phone]').val();
-        var email = $('input[name=edit_email]').val();
-        var address = $('input[name=edit_address]').val();
-        var tax = $('input[name=edit_tax]').val();
-        var bc = $('input[name=edit_bc]').val();
-        var toc = $('select[name=edit_toc]').val();
-
-        $.ajax({
-            method:"POST",
-            url:"http://localhost:1999/contact/postEditData",
-            data:{
-                "id":id,
-                "name":name,
-                "phone":phone,
-                "email":email,
-                "address":address,
-                "tax":tax,
-                "bc":bc,
-                "toc":toc
-            }
-        }).done(function(rs){
-            tableRole.ajax.reload();
-            $("#editer").modal("hide");
-            alert(rs);
-        });
+        var data = $("#editForm").serializeArray();
+        if($('#editForm select[name=calc_shipping_provinces] option:selected').text() != "City"){
+            data[14].value = $('#editForm select[name=calc_shipping_provinces] option:selected').text();
+        }else{
+            data[14].value = '';
+        }
+        if(!data[14].value){
+            alert("Please Choose The Location");
+            return;
+        }
+        if(!data[2].value){
+            alert('Missing Fill "Name"');
+        }else{
+            $.ajax({
+                method:"POST",
+                url:"http://localhost:1999/contact/postEditData",
+                data:{
+                    "id":id,
+                    "data":data
+                }
+            }).done(function(rs){
+                alert(rs);
+                tableRole.ajax.reload();
+                $("form#editer :input[type=text]").each(function(){
+                    var input = $(this);
+                    input.val("");
+                });
+                $("form#editer select").each(function(){
+                    var input = $(this);
+                    input.val(null);
+                });
+                $("#editer").modal("hide");
+            })
+        }
     });
     //cancel when adding customer
     $("#cancelAddingRole").click(function(){

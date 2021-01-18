@@ -703,27 +703,27 @@ body#page-top
   // Bootstrap core JavaScript
   script(src='https://cdn.jsdelivr.net/gh/vietblogdao/js/districts.min.js')
   script.
-    if (address_2 = localStorage.getItem('address_2_saved')) {
-      $('select[name="calc_shipping_district"] option').each(function() {
-        if ($(this).text() == address_2) {
-          $(this).attr('selected', '')
-        }
-      })
-      $('input.billing_address_2').attr('value', address_2)
-    }
-    if (district = localStorage.getItem('district')) {
-      $('select[name="calc_shipping_district"]').html(district)
-      $('select[name="calc_shipping_district"]').on('change', function() {
-        var target = $(this).children('option:selected')
-        target.attr('selected', '')
-        $('select[name="calc_shipping_district"] option').not(target).removeAttr('selected')
-        address_2 = target.text()
-        $('input.billing_address_2').attr('value', address_2)
-        district = $('select[name="calc_shipping_district"]').html()
-        localStorage.setItem('district', district)
-        localStorage.setItem('address_2_saved', address_2)
-      })
-    }
+    //- if (address_2 = localStorage.getItem('address_2_saved')) {
+    //-   $('select[name="calc_shipping_district"] option').each(function() {
+    //-     if ($(this).text() == address_2) {
+    //-       $(this).attr('selected', '')
+    //-     }
+    //-   })
+    //-   $('input.billing_address_2').attr('value', address_2)
+    //- }
+    //- if (district = localStorage.getItem('district')) {
+    //-   $('select[name="calc_shipping_district"]').html(district)
+    //-   $('select[name="calc_shipping_district"]').on('change', function() {
+    //-     var target = $(this).children('option:selected')
+    //-     target.attr('selected', '')
+    //-     $('select[name="calc_shipping_district"] option').not(target).removeAttr('selected')
+    //-     address_2 = target.text()
+    //-     $('input.billing_address_2').attr('value', address_2)
+    //-     district = $('select[name="calc_shipping_district"]').html()
+    //-     localStorage.setItem('district', district)
+    //-     localStorage.setItem('address_2_saved', address_2)
+    //-   })
+    //- }
     $('select[name="calc_shipping_provinces"]').each(function() {
       var $this = $(this),
         stc = ''

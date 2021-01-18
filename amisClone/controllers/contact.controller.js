@@ -367,28 +367,118 @@ module.exports.postDataForEdit = (req,res)=>{
 };
 //submit editer
 module.exports.postEditData = (req,res)=>{
-    if(req.body.name){
-        var id = req.body.id;
-        var name = req.body.name;
-        var phone = req.body.phone;
-        var email = req.body.email;
-        var address = req.body.address;
-        var tax = req.body.tax;
-        var bc = req.body.bc;
-        if(req.body.toc === "1" || req.body.toc === "2"){
-            var toc = parseInt(req.body.toc);
+    isPermission_contact_edit(req,function(check){
+        if(check == true){
+            var objectId = req.body.id;
+            var data = req.body.data;
+            if(!objectId){
+                req.send("Invalid Data");
+                return;
+            }
+            for(let i = 0;i<data.length;i++){
+                if(data[i].name == "name"){
+                    if(!data[i].value){
+                        res.send("Invalid Data!")
+                        return;
+                    }
+                }
+                if(data[i].name == "toc"){
+                    if(!data[i].value){
+                        res.send("Invalid Data!");
+                        return;
+                    }
+                }
+                if(data[i].name == "calc_shipping_provinces"){
+                    if(!data[i].value){
+                        res.send("Invalid Data!");
+                        return;
+                    }
+                }
+            }
+            /*--start "General Info" variable receiving-- */
+            var code = data[0].value;
+            var list = data[1].value;
+            var name = data[2].value;
+            var group = data[3].value;
+            if(data[4].value === "1" || data[4].value === "2"){
+                var toc = parseInt(data[4].value);
+            }else{
+                res.send("Invalid Type");
+                return;
+            }
+            var sc = data[5].value;
+            var dob = data[6].value;
+            //--end General data receiving--//
+
+            //--start Identify Card receiving data--//
+            var numberId = data[7].value;
+            var dateId = data[8].value;
+            var place = data[9].value;
+            //--end Identify Card receiving data--//
+
+            //--start Contact receiving data--//
+            var phone = data[10].value;
+            var fax = data[11].value;
+            var pc = data[12].value;
+            var email = data[13].value;
+            //--end Contact receiving data--//
+
+            //--start Location receiving data--//
+            var city = data[14].value;
+            var address = data[15].value;
+            var district = data[16].value;
+            var tp = data[17].value;
+            //--end Location receiving data--//
+
+            //--start Taxation & Bank Account receiving data--//
+            var tax = data[18].value;
+            var numberBank = data[19].value;
+            var bc = data[20].value;
+            var branch = data[21].value;
+            //--end Taxation & Bank Account receiving data--//
+            var validated = func_lib.func_validate_for_query(
+                [   
+                    code,list,name,group,sc,
+                    numberId,dateId,place,
+                    phone,fax,pc,email,
+                    address,tp,
+                    tax,bc,
+                    numberBank,branch
+                ]
+            );
+            if(!dob){
+                dob=null;
+            }
+            if(!validated[12]){
+                address=null;
+            }
+            var sql = 
+            "UPDATE `object` \
+            SET\
+                objectCode = ?, objectType = ?, objectName = ?, objectBirthday = ?, objectSwiftCode = ?, \
+                objectIdCard_Number = ?, objectIDCard_Date = ?, objectIDCard_Place = ?, \
+                objectContact_Phone = ?, objectContact_Fax = ?, objectContact_PostalCode = ?, objectContact_Email = ?, \
+                objectLocation_TradePlace = ?, \
+                objectTaxation_Tax = ?, objectTaxation_BudgetCode = ?, \
+                objectBank_AccountNumber = ?, objectBank_Branch = ? \
+            WHERE objectId = ?";
+            conn.query(sql,[
+                validated[0],toc,validated[2],dob,validated[4],
+                validated[5],validated[6],validated[7],
+                validated[8],validated[9],validated[10],validated[11],
+                validated[13],
+                validated[15],validated[16],
+                validated[17],validated[18],
+                objectId
+            ],(err,rs)=>{
+                if(err)throw err;
+                res.send("Updated!");
+            });
+
         }else{
-            res.send("Invalid Data");
-            return;
+            res.send("Permission Denied!");
         }
-        var sql = "UPDATE `object` SET name = ? , phone = ? , companyEmail = ? , address = ? , tax = ? , budgetCode = ? , objectType = ? WHERE objectId = ?";
-        conn.query(sql,[name,phone,email,address,tax,bc,toc,id],(err,rs)=>{
-            if(err)throw err;
-            res.send("Updated!");
-        });
-    }else{
-        res.send("Please fill inside (*) tag");
-    }
+    });
 };
 function isPermission_contact_del(req,callback){
     var token = req.signedCookies.auth_token;

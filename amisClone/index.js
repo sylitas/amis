@@ -17,16 +17,18 @@ Description:    Using express
 //require modules
 
 require('dotenv').config({path:".env"});
+
 var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var pug = require('pug');
 //require routers
-var authenticateRouter = require("./models/routers/authenticate.router");
-var dashboardRouter = require("./models/routers/dashboard.router");
-var managementRouter = require("./models/routers/management.router");
-var contactRouter = require("./models/routers/contact.router");
-var testRouter = require("./models/routers/test.router");
+const authenticateRouter = require("./models/routers/authenticate.router");
+const dashboardRouter = require("./models/routers/dashboard.router");
+const managementRouter = require("./models/routers/management.router");
+const contactRouter = require("./models/routers/contact.router");
+const testRouter = require("./models/routers/test.router");
+const clientRouter = require("./models/routers/client.router");
 
 var app = express();
 var port = 1999;
@@ -53,6 +55,7 @@ app.use('/management/role',managementRouter);
 // Contact contain all the information of personal client and company client
 app.use('/contact',contactRouter);
 //for testing
+app.use('/client',clientRouter);
 app.use('/test',testRouter);
 // for logout
 app.use('/logout',(req,res)=>{
