@@ -5,7 +5,7 @@ head
   meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
   meta(name='description' content='')
   meta(name='author' content='')
-  title Role
+  title Grant Permission
   // Custom fonts for this template
   script(src='http://localhost:1999/dashboard/vendor/jquery/jquery.min.js')
   link(href='http://localhost:1999/dashboard/vendor/fontawesome-free/css/all.min.css' rel='stylesheet' type='text/css')
@@ -20,7 +20,26 @@ head
   script(src='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.js')
   link(type='text/css' href='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css' rel='stylesheet')
   script(type='text/javascript' src='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js')
-  script(src='http://localhost:1999/management/role.js')
+  script(src='http://localhost:1999/management/LDAP.js')
+  style(type='text/css').
+    .tabcontent{
+      border:0;
+      padding-top:24px;
+    }
+    .tab{
+      margin-top: 24px;
+      border:0;
+      background-color:transparent;
+    }
+    .card{
+      background-color:transparent !important;
+    }
+    .float-right{
+      float: right;
+    }
+    .float-left{
+      float: left;
+    }
 body#page-top
   // Page Wrapper
   #wrapper
@@ -46,14 +65,14 @@ body#page-top
       .sidebar-heading
         | Grant Permission
       // Nav Item - Pages Collapse Menu
-      li.nav-item.active
-        a.nav-link(href='#')
+      li.nav-item
+        a.nav-link(href='/management/role')
           i.fas.fa-fw.fa-cog
           span Role
       // Divider
       hr.sidebar-divider
       // Nav Item - Pages Collapse Menu
-      li.nav-item
+      li.nav-item.active
         a.nav-link.collapsed(href='/management/LDAP')
           i.fas.fa-fw.fa-folder
           span LDAP
@@ -196,71 +215,61 @@ body#page-top
                   |                                     Logout
         // End of Topbar
         // Begin Page Content
-        .container-fluid#noPadding
-          .card#card1
-            .card-header
-              h4.mt-0.font-weight-bold.text-primary Roles
-              .row
-                .col-12#paddingTop
-                  button#add.btn.btn-light.btn-icon-split(data-toggle='modal' data-target='#addRole')
-                    span.icon.text-gray-600
-                      i.fas.fa-plus
-                    span.text Create
-                  button#edit.btn.btn-light.btn-icon-split(data-toggle='modal' data-target='#editer')
-                    span.icon.text-gray-600
-                      i.fas.fa-edit
-                    span.text Edit
-                  button#delete.btn.btn-light.btn-icon-split
-                    span.icon.text-gray-600
-                      i.fas.fa-trash
-                    span.text Delete
-                  button#reload.btn.btn-light.btn-icon-split
-                    span.icon.text-gray-600
-                      i.fas.fa-sync
-                    span.text Reload
-                  span.text |   
-                  button#grantPermission.btn.btn-light.btn-icon-split(data-toggle='modal' data-target='#grant')
-                    span.icon.text-gray-600
-                      i.fas.fa-network-wired
-                    span.text Grant Permision
-                  span.text | 
-                  button#export.btn.btn-light.btn-icon-split
-                    span.icon.text-gray-600
-                      i.fas.fa-file-export
-                    span.text Export
-            .card-body.card-body-1
-              .table-responsive
-                table#dataTable-Role.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
-                  thead
-                    tr
-                      th(width='10%') Code
-                      th(width='20%') Role
-                      th(width='70%') Description
-          .card#card2
-            .card-header
-              h4.m-0.font-weight-bold.text-primary Role's members
-            .card-body.card-body-2
-              .table-responsive
-                table#dataTable-contained.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
-                  thead
-                    tr
-                      th(width="5%") Member Code
-                      th(width="20%") Member's username
-                      th(width="20%") Full Name
-                      th(width="10%") Title
-                      th(width="25%") Work At
-                      th(width="20%") Description
-            .card-footer
-              .row
-                .col-12
-                  a#addMember.btn.btn-light.btn-icon-split(href="#" data-toggle='modal' data-target='#addUser')
-                    span.icon.text-gray-600
-                      i.fas.fa-plus
-                    span.text Add
-                  a#deleteUserInRole.btn.btn-light.btn-icon-split(href="#")
-                    span.icon.text-gray-600
-                      i.fas.fa-trash
-                    span.text Remove
+        .container-fluid
+          .card
+            .card-body
+              .tab
+                button.tablinks.active(onclick="openCity(event, 'LDAP')") LDAP
+                button.tablinks(onclick="openCity(event, '2')") Paris
+                button.tablinks(onclick="openCity(event, '3')") Tokyo
+              #LDAP.tabcontent
+                .card
+                  .card-header
+                    h4.m-0.font-weight-bold.text-primary LDAP
+                  .card-footer
+                  .card-body
+                    .form#createConnection
+                      .row
+                        .col-1
+                        .col-1
+                          p IP :
+                        .col-2
+                          .input-group
+                            input(name="ip" type="text" style={width:"100%"} placeholder="ldap://xxx.xxx.xxx.xx")
+                      .row
+                        .col-1
+                        .col-1
+                          p Base DN :
+                        .col-2
+                          .input-group
+                            input(name="baseDN" type="text" style={width:"100%"} placeholder="dc=xxx,dc=xxx")
+                      .row
+                        .col-1
+                        .col-1
+                          p Username :
+                        .col-2
+                          .input-group
+                            input(name="username" type="text" style={width:"100%"} placeholder="abc@example.com")
+                      .row
+                        .col-1
+                        .col-1
+                          p Password :
+                        .col-2
+                          .input-group
+                            input(name="password" type="text" style={width:"100%"} placeholder="Password")
+                      .row
+                        .col-1
+                        .col-1
+                        .col-2
+                          button#submitConnection.float-right.btn.btn-primary(type="submit" form="createConnection") Create Connection
+                          button#testConnection.float-left.btn.btn-info(type='button') Test
+              #2.tabcontent
+                h3 Paris
+                p Paris is the capital of France.
+              #3.tabcontent
+                h3 Tokyo
+                p Tokyo is the capital of Japan.
+
   .invisible_div
     p#check_use=use
     p#check_add=add
@@ -268,113 +277,6 @@ body#page-top
     p#check_del=del
     p#check_export=exp
   //modal for create a new role
-  #addRole.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
-    .modal-dialog-centered(role='document')
-      .modal-content
-        .modal-header
-          h5#exampleModalLabel.modal-title Role Creater
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
-            span(aria-hidden='true') &times;
-        .modal-body
-          form#addingRole()
-            .row
-              .col-4
-                p Role (<b style="color:red">*</b>)
-              .col-8
-                .input-group
-                  input(name="role" type="text" style={width:"100%"} placeholder="Role's name")
-            .row
-              .col-4
-                p Description
-              .col-8
-                .input-group
-                  textarea(name="note", cols="50", rows="7" placeholder="Note")
-        .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          button#submitAddingRole.btn.btn-primary(type="submit" form="addingRole") Save
-      // End of Footer
-    // End of Content Wrapper
-  //modal for edit role
-  #editer.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
-    .modal-dialog-centered(role='document')
-      .modal-content
-        .modal-header
-          h5#exampleModalLabel.modal-title Role Editer
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
-            span(aria-hidden='true') &times;
-        .modal-body
-          form#editRole()
-            .row
-              .col-4
-                p Role (<b style="color:red">*</b>)
-              .col-8
-                .input-group
-                  input#inputNameRole(name="role" type="text" style={width:"100%"} placeholder="Role's name")
-            .row
-              .col-4
-                p Description
-              .col-8
-                .input-group
-                  textarea#inputNoteRole(name="note", cols="50", rows="7" placeholder="Note")
-        .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          button#submitEdit.btn.btn-primary(type="submit" form="editRole") Save
-  //modal for grant
-  #grant.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
-    .modal-dialog-centered#widther(role='document')
-      .modal-content
-        .modal-header
-          h5#exampleModalLabel.modal-title Grant Permision
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
-            span(aria-hidden='true') &times;
-        .modal-body
-          .row
-            .col-9
-              h5 Function
-              ul#myUL
-                li
-                  span.caret Function
-                  ul.nested
-            .col-3
-              h5 Action
-              .card
-                .card-body
-                  .table-responsive
-                    form#checkboxAction
-                      table#action.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border.table-striped(width='100%' cellspacing='0')
-                        thead
-                          tr
-                            th ID
-                            th Action
-        .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          button#submitCheckboxAction.btn.btn-primary(type="submit" form="checkboxAction") Save
-  //detail do later
-  //modal for add new user
-  #addUser.modal(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
-    .modal-dialog-centered#widther(role='document')
-      .modal-content
-        .modal-header
-          h5#exampleModalLabel.modal-title User Adder
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
-            span(aria-hidden='true') &times;
-        .modal-body#rmpadding
-          .card#card3
-            .card-body
-              .table-responsive
-                form#addingUser
-                  table#dataTableUser.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border.table-striped(width='100%' cellspacing='0')
-                    thead
-                      tr
-                        th ID
-                        th Username
-                        th Full Name
-                        th Title
-                        th Work At
-                        th Description
-        .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
-          button#submitAddingUser.btn.btn-primary(type="submit" form="addingUser") Add
   // End of Page Wrapper
   // Scroll to Top Button
   a.scroll-to-top.rounded(href='#page-top')
@@ -392,6 +294,21 @@ body#page-top
           button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           a.btn.btn-primary(href='/logout') Logout
   // Bootstrap core JavaScript
+  script.
+    document.getElementById('LDAP').style.display = "block";
+    function openCity(evt, tab) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+      }
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+      document.getElementById(tab).style.display = "block";
+      evt.currentTarget.className += " active";
+    }
   script(src='http://localhost:1999/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js')
   // Core plugin JavaScript
   script(src='http://localhost:1999/dashboard/vendor/jquery-easing/jquery.easing.min.js')

@@ -17,7 +17,6 @@ Description:    Using express
 //require modules
 
 require('dotenv').config({path:".env"});
-
 var express = require('express');
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -29,6 +28,7 @@ const managementRouter = require("./models/routers/management.router");
 const contactRouter = require("./models/routers/contact.router");
 const testRouter = require("./models/routers/test.router");
 const clientRouter = require("./models/routers/client.router");
+const LDAPRouter = require("./models/routers/LDAP.router");
 
 var app = express();
 var port = 1999;
@@ -51,12 +51,15 @@ app.use('/dashboard',dashboardRouter);
 // '/management/role'--->management.router.js--->management.controller.js
 // Management is a site that contain everything with manage. Role API is one of them 
 app.use('/management/role',managementRouter);
+// for LDAP
+app.use('/management/LDAP',LDAPRouter);
 //'/contact -->contact.router.js------>contact.controller.js
 // Contact contain all the information of personal client and company client
 app.use('/contact',contactRouter);
 //for testing
-app.use('/client',clientRouter);
 app.use('/test',testRouter);
+// client is the same with contact -------------//do it later
+app.use('/client',clientRouter);
 // for logout
 app.use('/logout',(req,res)=>{
     res.clearCookie("auth_token");
