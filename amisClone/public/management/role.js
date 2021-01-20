@@ -19,7 +19,7 @@ $(document).ready(function() {
         ],
         "createdRow":function(row,data,dataIndex,cells){
             if(data.id == 1){
-            $(row).addClass( 'table-primary' );
+                $(row).addClass( 'table-primary' );
             }
         },
         "rowId": function(a) {

@@ -313,7 +313,6 @@ module.exports.postUserDataByAjax = (req,res)=>{
 module.exports.postDataForAddingUser = (req,res)=>{
     var userId = req.body.userId;
     var roleId = req.body.roleId;
-    var check = 0;
     if(req.body.roleId !== undefined && userId !== undefined){
         for (var i=0;i<userId.length;i++){
             var id = userId[i];

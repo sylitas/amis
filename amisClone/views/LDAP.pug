@@ -40,6 +40,9 @@ head
     .float-left{
       float: left;
     }
+    .dataTables_wrapper div.dataTables_length select{
+      width:60px !important;
+    }
 body#page-top
   // Page Wrapper
   #wrapper
@@ -219,8 +222,8 @@ body#page-top
           .card
             .card-body
               .tab
-                button.tablinks.active(onclick="openCity(event, 'LDAP')") LDAP
-                button.tablinks(onclick="openCity(event, '2')") Paris
+                button#cl_LDAP.tablinks.active(onclick="openCity(event, 'LDAP')") LDAP
+                button#cl_LDAPuser.tablinks(onclick="openCity(event, 'LDAPuser')") Users
                 button.tablinks(onclick="openCity(event, '3')") Tokyo
               #LDAP.tabcontent
                 .card
@@ -228,44 +231,68 @@ body#page-top
                     h4.m-0.font-weight-bold.text-primary LDAP
                   .card-footer
                   .card-body
-                    .form#createConnection
+                    form#createConnection(autocomplete="off")
                       .row
                         .col-1
                         .col-1
                           p IP :
                         .col-2
                           .input-group
-                            input(name="ip" type="text" style={width:"100%"} placeholder="ldap://xxx.xxx.xxx.xx")
+                            input(name="ip" type="text" style={width:"100%"} placeholder="IP address or domain" value=url)
                       .row
                         .col-1
                         .col-1
                           p Base DN :
                         .col-2
                           .input-group
-                            input(name="baseDN" type="text" style={width:"100%"} placeholder="dc=xxx,dc=xxx")
+                            input(name="baseDN" type="text" style={width:"100%"} placeholder="dc=example, dc=demo" value=baseDN)
                       .row
                         .col-1
                         .col-1
                           p Username :
                         .col-2
                           .input-group
-                            input(name="username" type="text" style={width:"100%"} placeholder="abc@example.com")
+                            input(name="username" type="text" style={width:"100%"} placeholder="abc@example.com" value=username)
                       .row
                         .col-1
                         .col-1
                           p Password :
                         .col-2
                           .input-group
-                            input(name="password" type="text" style={width:"100%"} placeholder="Password")
+                            input(name="password" type="password" style={width:"100%"} placeholder="Password" value=password)
                       .row
                         .col-1
                         .col-1
                         .col-2
                           button#submitConnection.float-right.btn.btn-primary(type="submit" form="createConnection") Create Connection
-                          button#testConnection.float-left.btn.btn-info(type='button') Test
-              #2.tabcontent
-                h3 Paris
-                p Paris is the capital of France.
+                      .row.mt-3
+                        .col-1
+                        .col-2
+                          p Connection Status :
+                        .col-2
+                          p#status
+              #LDAPuser.tabcontent
+                .card
+                  .card-header
+                    .row
+                      .col-6
+                        h4.m-0.font-weight-bold.text-primary LDAP Users
+                      .col-6
+                        button#sync.float-right.btn.btn-light.btn-icon-split
+                          span.icon.text-gray-600
+                            i.fas.fa-sync-alt
+                          span.text Sync              
+                  .card-footer
+                  .card-body
+                    .table-responsive
+                      table#dataTable-LDAPuser.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
+                        thead
+                          tr
+                            th(width='20%') Username
+                            th(width='20%') Full name
+                            th(width='20%') Email
+                            th(width='30%') Description
+                            th(width='10%') Status
               #3.tabcontent
                 h3 Tokyo
                 p Tokyo is the capital of Japan.
