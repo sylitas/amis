@@ -1,11 +1,11 @@
 $(document).ready(function() {
     var tableRole;
-    if($("input[name=ip]")){
+    if($("input[name=ip]").val()){
         $("#status").css("color","green");
-        $("#status").text("Connected!");
+        $("#status").text("Connected !");
     }else{
         $("#status").css("color","red");
-        $("#status").text("Disconnected!");
+        $("#status").text("Disconnected !");
     }
     $('#submitConnection').click(function(e){
         e.preventDefault();
@@ -14,8 +14,6 @@ $(document).ready(function() {
         var baseDN = data[1].value;
         var username = data[2].value;
         var password = data[3].value;
-        $("#status").css("color","red");
-        $("#status").text("Disonnected!");
         if(!ip){
             alert("Invalid Data!");
             return;
@@ -80,12 +78,19 @@ $(document).ready(function() {
                 }
             },
             "language": {
-                searchPlaceholder: "Search Name"
+                searchPlaceholder: "Search Full Name"
             }
         });
     });
     $("#cl_LDAP").click(function () {
-        tableRole.destroy();
+        if ($.fn.DataTable.isDataTable('#dataTable-LDAPuser' )) {
+            tableRole.destroy();
+        }
+    });
+    $("#cl_").click(function () {
+        if ($.fn.DataTable.isDataTable('#dataTable-LDAPuser' )) {
+            tableRole.destroy();
+        }
     });
     $("#sync").click(function(){
         $.ajax({

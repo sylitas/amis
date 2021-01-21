@@ -12,7 +12,8 @@ var db = require("../database/sqlite.database");
 var privateKey = process.env.KEY;
 var key = process.env.KEY;
 //Active directory config
-var domain = process.env.URL_DOMAIN;
+const domain = process.env.URL_DOMAIN;
+
 function get_ad(callback){
     db.all("SELECT * FROM `ldap` WHERE id = 1",(err,rs)=>{
         if(rs.length > 0){
@@ -22,7 +23,6 @@ function get_ad(callback){
             var cipher_password = rs[0].password;
             var decrypt_password  = CryptoJS.AES.decrypt(cipher_password, key);
             var password = decrypt_password.toString(CryptoJS.enc.Utf8);
-            console.log(password)
             var config = { 
                 url     : ip,
                 baseDN  : baseDN,
@@ -51,60 +51,67 @@ module.exports.postAuthenticate = (req,res)=>{
     var password = req.body.password;
     var sql = "CALL Proc_SelectAccountForLogin(?,?)";
     conn.query(sql,[username,md5(password)],(err,rs)=>{
-        if(err){throw err}else{
-            rs = rs[0];
-            //check user is local-user or ldap-user
-            if(rs.length>0){
-                var userId = rs[0].userId;
-                var sql = "CALL Proc_SelectRoleUser(?)";
-                conn.query(sql,[userId],(err,rs)=>{
-                    if(err) throw err;
-                    var role = rs[0][0].userRoleName;
-                    var roleId = rs[0][0].userRoleId;
-                    func_token(res,userId,role,roleId);
-                });
-            }else{
-                get_ad((ad)=>{
-                    var name = username+domain;
-                    ad.authenticate(name, password, function(err, auth) {
-                        if (auth) {
-                            var sql = "CALL Proc_SelectUserInUser(?)";
-                            conn.query(sql,[username],(err,rs)=>{
-                                if(err) throw err;
-                                rs = rs[0];
-                                if(rs.length>0){
-                                    var userId = rs[0].userId;
-                                    var sql = "CALL Proc_SelectRoleUser(?)";
-                                    conn.query(sql,[userId],(err,rs)=>{
+        if(err){throw err}
+        rs = rs[0];
+        //check user is local-user or ldap-user
+        if(rs.length>0){
+            var userId = rs[0].userId;
+            var sql = "CALL Proc_SelectRoleUser(?)";
+            conn.query(sql,[userId],(err,rs)=>{
+                if(err) throw err;
+                var role = rs[0][0].userRoleName;
+                var roleId = rs[0][0].userRoleId;
+                func_token(res,userId,role,roleId);
+            });
+        }else{
+            get_ad((ad)=>{
+                if(username.includes("@htc-itc.local")){
+                    var name = username ;
+                }else{
+                    var name = username + domain;
+                }
+                ad.authenticate(name, password, function(err, auth) {
+                    if (auth) {
+                        var sql = "CALL Proc_SelectUserInUser(?)";
+                        conn.query(sql,[username],(err,rs)=>{
+                            if(err) throw err;
+                            rs = rs[0];
+                            if(rs.length>0){
+                                var userId = rs[0].userId;
+                                var sql = "CALL Proc_SelectRoleUser(?)";
+                                conn.query(sql,[userId],(err,rs)=>{
+                                    if(rs[0].length>0){
                                         if(err) throw err;
                                         var role = rs[0][0].userRoleName;
                                         var roleId = rs[0][0].userRoleId
                                         func_token(res,userId,role,roleId);
-                                    });
-                                }else{
-                                    var sql = "CALL Proc_InsertUserFromLDAP(?)";
+                                    }else{
+                                        res.send("Ask admin for granting permission for this account !");
+                                    }
+                                });
+                            }else{
+                                var sql = "CALL Proc_InsertUserFromLDAP(?)";
+                                conn.query(sql,[username],(err,rs)=>{
+                                    if(err) throw err;
+                                    var sql = "CALL Proc_SelectUserInUser(?)";
                                     conn.query(sql,[username],(err,rs)=>{
                                         if(err) throw err;
-                                        var sql = "CALL Proc_SelectUserInUser(?)";
-                                        conn.query(sql,[username],(err,rs)=>{
+                                        var userId = rs[0][0].userId;
+                                        func_roleForNewUser(userId);
+                                        var sql = "CALL Proc_SelectRoleUser(?)";
+                                        conn.query(sql,[userId],(err,rs)=>{
                                             if(err) throw err;
-                                            var userId = rs[0][0].userId;
-                                            func_roleForNewUser(userId);
-                                            var sql = "CALL Proc_SelectRoleUser(?)";
-                                            conn.query(sql,[userId],(err,rs)=>{
-                                                if(err) throw err;
-                                                var role = rs[0][0].userRoleName;
-                                                var roleId = rs[0][0].userRoleId
-                                                func_token(res,userId,role,roleId);
-                                            });
+                                            var role = rs[0][0].userRoleName;
+                                            var roleId = rs[0][0].userRoleId
+                                            func_token(res,userId,role,roleId);
                                         });
                                     });
-                                }
-                            });
-                        }else{res.send("Wrong Username or Password");}
-                    });
-                })
-            }
+                                });
+                            }
+                        });
+                    }else{res.send("Wrong Username or Password");}
+                });
+            })
         }
     });
 };
