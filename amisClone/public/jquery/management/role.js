@@ -29,45 +29,7 @@ $(document).ready(function() {
             searchPlaceholder: "Search Role"
         }
     });
-    var tableUser = $('#dataTableUser').DataTable({
-        "scrollY":"50vh",
-        "scrollX":true,
-        "paging":   false,
-        "ordering": false,
-        "info":     false,
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-            "type": "POST",
-            "url":"http://localhost:1999/management/role/postUserDataByAjax"
-        },
-        "columns": [
-            {"data": "id"}, 
-            {"data": "username"},
-            {"data": "fullname"},
-            {"data": "title"},
-            {"data": "place"},
-            {"data": "note"}
-        ],
-        "rowId": function(a) {
-            return a.id;
-        },
-        "language": {
-            searchPlaceholder: "Search Username"
-        },
-        "columnDefs":[
-            {
-                'targets':0,
-                'checkboxes':{
-                    'selectRow':true
-                }
-            }
-        ],
-        'select': {
-            'style': 'multi'
-         },
-        'order': [[1, 'asc']]
-    });
+    var tableUser;
     var tableContained = $('#dataTable-contained').DataTable({
         "scrollY":"20vh",
         "paging":   false,
@@ -81,61 +43,8 @@ $(document).ready(function() {
             "url":"http://localhost:1999/management/role/postUserInRoleByAjax"
         }
     });
-    var tableAction = $('#action').DataTable({
-        "scrollY":"50vh",
-        "paging":   false,
-        "ordering": false,
-        "info":     false,
-        "filter":false,
-        "processing": true,
-        "serverSide": true,
-        "ajax": {
-            "type": "POST",
-            "url":"http://localhost:1999/management/role/postActionData",
-            "data":{
-                "fId":1,
-                "urId":1
-            }
-            // ,"dataSrc": function(rs){
-            //     for(var i=0;i<rs.data.length;i++){
-            //         if(rs.data[i].check == true){
-            //             $()
-            //         }else{
-            //             console.log("false");
-            //         }
-            //     }
-            //     return rs.data;
-            // }
-        },
-        "initComplete": function(settings){
-            var api = this.api();
-            api.cells(
-                api.rows(function(idx,data,node){
-                    return (data.check == true) ? true : false;
-                }).indexes(),0
-            ).checkboxes.select();
-        },
-        "columns": [
-            {"data": "id"}, 
-            {"data": "name"}
-        ],
-        "rowId": function(a) {
-            return a.id;
-        },
-        "columnDefs":[
-            {
-                'targets':0,
-                'checkboxes':{
-                    'selectRow':true
-                }
-            }
-        ],
-        'deferRender': true,
-        'select': {
-            'style': 'multi'
-        },
-        'order': [[1, 'asc']]
-    });
+    var tableAction;
+
     $('#addingUser').on('submit', function(e){
         var arr_rows = [];
         id = $(".table-primary").find("td:first-child").text();
@@ -157,6 +66,9 @@ $(document).ready(function() {
                 }
                 tableUser.columns(0).checkboxes.deselectAll()
                 tableContained.ajax.reload();
+                if ($.fn.DataTable.isDataTable('#dataTableUser')) {
+                    tableUser.destroy();
+                }
                 $("#addUser").modal("hide");
             });
         }else{
@@ -299,6 +211,58 @@ $(document).ready(function() {
             method:"POST",
             url:"http://localhost:1999/management/role/postFuction"
         }).done(function(rs){
+            if(rs == "noPermission"){
+                alert("Permission Denied!");
+                $("#grant").modal("hide");
+                return;
+            }
+            //Generate Table
+            tableAction = $('#action').DataTable({
+                "scrollY":"50vh",
+                "paging":   false,
+                "ordering": false,
+                "info":     false,
+                "filter":false,
+                "processing": true,
+                "serverSide": true,
+                "ajax": {
+                    "type": "POST",
+                    "url":"http://localhost:1999/management/role/postActionData",
+                    "data":{
+                        "fId":1,
+                        "urId":1
+                    }
+                },
+                "initComplete": function(settings){
+                    var api = this.api();
+                    api.cells(
+                        api.rows(function(idx,data,node){
+                            return (data.check == true) ? true : false;
+                        }).indexes(),0
+                    ).checkboxes.select();
+                },
+                "columns": [
+                    {"data": "id"}, 
+                    {"data": "name"}
+                ],
+                "rowId": function(a) {
+                    return a.id;
+                },
+                "columnDefs":[
+                    {
+                        'targets':0,
+                        'checkboxes':{
+                            'selectRow':true
+                        }
+                    }
+                ],
+                'deferRender': true,
+                'select': {
+                    'style': 'multi'
+                },
+                'order': [[1, 'asc']]
+            });
+            //Generate Tree Function
             if(!$('li').hasClass("functionList")){
                 for(var i=0;i<rs.length;i++){
                     if(rs[i].note==null){
@@ -334,6 +298,79 @@ $(document).ready(function() {
                     }
                 }
         });
+    });
+    //1,2 for Action
+    $("#closeMe").click(function() {
+        if ($.fn.DataTable.isDataTable('#action')) {
+            tableAction.destroy();
+        }
+    });
+    $("#closeMe2").click(function() {
+        if ($.fn.DataTable.isDataTable('#action')) {
+            tableAction.destroy();
+        }
+    });
+    $("#addMember").click(function(){
+        tableUser = $('#dataTableUser').DataTable({
+            "scrollY":"50vh",
+            "scrollX":true,
+            "paging":   false,
+            "ordering": false,
+            "info":     false,
+            "processing": true,
+            "serverSide": true,
+            "ajax": {
+                "type": "POST",
+                "url":"http://localhost:1999/management/role/postUserDataByAjax"
+            },
+            "columns": [
+                {"data": "id"}, 
+                {"data": "username"},
+                {"data": "fullname"},
+                {"data": "title"},
+                {"data": "place"},
+                {"data": "note"}
+            ],
+            "rowId": function(a) {
+                return a.id;
+            },
+            "language": {
+                searchPlaceholder: "Search Username"
+            },
+            "columnDefs":[
+                {
+                    'targets':0,
+                    'checkboxes':{
+                        'selectRow':true
+                    }
+                }
+            ],
+            'select': {
+                'style': 'multi'
+             },
+            'order': [[1, 'asc']]
+        });
+    });
+    $("html").keyup(function(e){
+        if(e.keyCode == 27){
+            if ($.fn.DataTable.isDataTable('#action')) {
+                tableAction.destroy();
+            }
+            if ($.fn.DataTable.isDataTable('#dataTableUser')) {
+                tableUser.destroy();
+            }
+        }
+    });
+    //3,4 for addMember
+    $("#closeMe3").click(function() {
+        if ($.fn.DataTable.isDataTable('#dataTableUser')) {
+            tableUser.destroy();
+        }
+    });
+    $("#closeMe4").click(function() {
+        if ($.fn.DataTable.isDataTable('#dataTableUser')) {
+            tableUser.destroy();
+        }
     });
     //click each function to display new action
     $(document).on("click",".functionList",function(){

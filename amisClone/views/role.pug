@@ -20,7 +20,7 @@ head
   script(src='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.js')
   link(type='text/css' href='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css' rel='stylesheet')
   script(type='text/javascript' src='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js')
-  script(src='http://localhost:1999/management/role.js')
+  script(src='http://localhost:1999/jquery/management/role.js')
 body#page-top
   // Page Wrapper
   #wrapper
@@ -325,7 +325,7 @@ body#page-top
       .modal-content
         .modal-header
           h5#exampleModalLabel.modal-title Grant Permision
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
+          button#closeMe.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body
           .row
@@ -347,7 +347,7 @@ body#page-top
                             th ID
                             th Action
         .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          button#closeMe2.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           button#submitCheckboxAction.btn.btn-primary(type="submit" form="checkboxAction") Save
   //detail do later
   //modal for add new user
@@ -356,7 +356,7 @@ body#page-top
       .modal-content
         .modal-header
           h5#exampleModalLabel.modal-title User Adder
-          button.close(type='button' data-dismiss='modal' aria-label='Close')
+          button#closeMe3.close(type='button' data-dismiss='modal' aria-label='Close')
             span(aria-hidden='true') &times;
         .modal-body#rmpadding
           .card#card3
@@ -373,7 +373,7 @@ body#page-top
                         th Work At
                         th Description
         .modal-footer
-          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          button#closeMe4.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
           button#submitAddingUser.btn.btn-primary(type="submit" form="addingUser") Add
   // End of Page Wrapper
   // Scroll to Top Button

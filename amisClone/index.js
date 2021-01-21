@@ -24,7 +24,7 @@ var pug = require('pug');
 //require routers
 const authenticateRouter = require("./models/routers/authenticate.router");
 const dashboardRouter = require("./models/routers/dashboard.router");
-const managementRouter = require("./models/routers/management.router");
+const roleRouter = require("./models/routers/role.router");
 const contactRouter = require("./models/routers/contact.router");
 const testRouter = require("./models/routers/test.router");
 const clientRouter = require("./models/routers/client.router");
@@ -50,7 +50,7 @@ app.use('/',authenticateRouter);
 app.use('/dashboard',dashboardRouter);
 // '/management/role'--->management.router.js--->management.controller.js
 // Management is a site that contain everything with manage. Role API is one of them 
-app.use('/management/role',managementRouter);
+app.use('/management/role',roleRouter);
 // for LDAP
 app.use('/management/LDAP',LDAPRouter);
 //'/contact -->contact.router.js------>contact.controller.js

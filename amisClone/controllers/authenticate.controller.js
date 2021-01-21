@@ -65,7 +65,7 @@ module.exports.postAuthenticate = (req,res)=>{
             });
         }else{
             get_ad((ad)=>{
-                if(username.includes("@htc-itc.local")){
+                if(username.includes(domain)){
                     var name = username ;
                 }else{
                     var name = username + domain;
@@ -85,29 +85,9 @@ module.exports.postAuthenticate = (req,res)=>{
                                         var role = rs[0][0].userRoleName;
                                         var roleId = rs[0][0].userRoleId
                                         func_token(res,userId,role,roleId);
-                                    }else{
-                                        res.send("Ask admin for granting permission for this account !");
-                                    }
+                                    }else{res.send("Ask admin for granting permission for this account!");}
                                 });
-                            }else{
-                                var sql = "CALL Proc_InsertUserFromLDAP(?)";
-                                conn.query(sql,[username],(err,rs)=>{
-                                    if(err) throw err;
-                                    var sql = "CALL Proc_SelectUserInUser(?)";
-                                    conn.query(sql,[username],(err,rs)=>{
-                                        if(err) throw err;
-                                        var userId = rs[0][0].userId;
-                                        func_roleForNewUser(userId);
-                                        var sql = "CALL Proc_SelectRoleUser(?)";
-                                        conn.query(sql,[userId],(err,rs)=>{
-                                            if(err) throw err;
-                                            var role = rs[0][0].userRoleName;
-                                            var roleId = rs[0][0].userRoleId
-                                            func_token(res,userId,role,roleId);
-                                        });
-                                    });
-                                });
-                            }
+                            }else{res.send("Sync first!");}
                         });
                     }else{res.send("Wrong Username or Password");}
                 });
@@ -124,12 +104,6 @@ function insert(userId,cookie){
     db.run("INSERT INTO `cookies`(userId,cookie) VALUES(?,?)",[userId,cookie],(err,rs)=>{
         if(err) throw err;
     })
-};
-function func_roleForNewUser(userId){
-    var sql = "CALL Proc_InsertNewUserRole(?)";
-    conn.query(sql,[userId],(err,rs)=>{
-        if(err) throw err;
-    });
 };
 function func_token(res,userId,role,roleId){
     //create JWT
