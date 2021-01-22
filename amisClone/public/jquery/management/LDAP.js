@@ -93,11 +93,18 @@ $(document).ready(function() {
         }
     });
     $("#sync").click(function(){
+        $(".fa-sync-alt").addClass("fa-spin");
+        $("#syncTxt").text("Syncing...");
         $.ajax({
             type: "POST",
             url: "http://localhost:1999/management/LDAP/syncDataToDatabase"
         }).done(function(rs){
-            alert(rs);
+            if(rs == "Done"){
+                setTimeout(function(){
+                    $(".fa-sync-alt").removeClass("fa-spin");
+                    $("#syncTxt").text("Sync");
+                },5000);
+            }
         });
     });
 });

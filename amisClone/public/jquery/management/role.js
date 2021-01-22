@@ -44,7 +44,6 @@ $(document).ready(function() {
         }
     });
     var tableAction;
-
     $('#addingUser').on('submit', function(e){
         var arr_rows = [];
         id = $(".table-primary").find("td:first-child").text();
@@ -465,7 +464,7 @@ $(document).ready(function() {
     $('#grantPermission').prop('disabled', true);
     $('#export').prop('disabled', true);
     //if true set active
-
+    
     if($('p[id=check_use]').text()=="true"){
         $('#grantPermission').prop('disabled', false);
     }

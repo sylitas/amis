@@ -2,11 +2,13 @@ var ActiveDirectory = require('activedirectory');
 var CryptoJS = require("crypto-js");
 var jwt = require('jsonwebtoken');
 
+
 var privateKey = process.env.KEY;
 var key = process.env.KEY;
 
 var db = require("../database/sqlite.database");
 var conn = require("../database/main.database");
+var func_lib = require("./function.controller");
 
 var key = process.env.KEY;
 const isLocal = 2;
@@ -16,21 +18,52 @@ module.exports.getAuthLDAPPage = (req,res)=>{
     if(req.signedCookies.auth_token){
         var token = req.signedCookies.auth_token;
         var userId = decode(token,privateKey).userId;
-        var role = decode(token,privateKey).role;
+        var role = decode(token,privateKey).roleId;
         db.all("SELECT * FROM `cookies` WHERE cookie = ? AND userId = ?",[token,userId],(err,rs)=>{
             if(err) throw err;
             if(rs.length>0){
                 //render
-                get_connection_from_LDAP(function(config){
-                    if(config){
-                        res.render("LDAP",{
-                            "url":config.url,
-                            "baseDN":config.baseDN,
-                            "username":config.username,
-                            "password":config.password
+                var sql = "CALL Proc_SelectUserInUserByUserId(?)";
+                conn.query(sql,[userId],(err,rs)=>{
+                    if(err)throw err;
+                    if(rs.length>0){
+                        var username = rs[0][0].accountName;
+                        var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
+                        conn.query(sql,[role],(err,rs)=>{
+                            if(err)throw err;
+                            rs = rs[0];
+                            var checkPer = [];
+                            if(rs.length>0){
+                                for(var i=0;i<rs.length;i++){
+                                    checkPer.push(rs[i].actionId);
+                                }
+                                var data = func_lib.func_noPer(checkPer);
+                                get_connection_from_LDAP(function(config){
+                                    if(config){
+                                        res.render("LDAP",{
+                                            "accountName":username,
+                                            "url":config.url,
+                                            "baseDN":config.baseDN,
+                                            "username":config.username,
+                                            "password":config.password,
+                                            "use":data.use,
+                                            "add":data.add,
+                                            "edit":data.edit,
+                                            "del":data.del,
+                                            "exp":data.exp
+                                        });
+                                    }else{
+                                        res.render("LDAP",{
+                                            "accountName":username
+                                        });
+                                    }
+                                });
+                            }else{
+                                res.render("LDAP",{
+                                    "accountName":username
+                                });
+                            }
                         });
-                    }else{
-                        res.render("LDAP");
                     }
                 });
             }else{res.redirect("/logout");}
