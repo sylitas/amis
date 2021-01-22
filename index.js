@@ -31,7 +31,7 @@ const clientRouter = require("./models/routers/client.router");
 const LDAPRouter = require("./models/routers/LDAP.router");
 
 var app = express();
-var port = process.env.POST || 1999;
+var port = process.env.PORT || 1999;
 //body-parser config
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
