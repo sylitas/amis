@@ -83,7 +83,7 @@ module.exports.postAuthenticate = (req,res)=>{
                                     if(rs[0].length>0){
                                         if(err) throw err;
                                         var role = rs[0][0].userRoleName;
-                                        var roleId = rs[0][0].userRoleId
+                                        var roleId = rs[0][0].userRoleId;
                                         func_token(res,userId,role,roleId);
                                     }else{res.send("Ask admin for granting permission for this account!");}
                                 });

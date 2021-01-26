@@ -13,6 +13,12 @@ Objective:      Create management api (focusing on role and grant permision)
 Description:    Using express
 
 .env contains private key
+
+const functionId = page 
+{
+    1 = /management/role
+    2 = /contact/
+}
 */
 //require modules
 

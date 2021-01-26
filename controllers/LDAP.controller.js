@@ -5,6 +5,7 @@ var jwt = require('jsonwebtoken');
 
 var privateKey = process.env.KEY;
 var key = process.env.KEY;
+const functionId = 1;// /management/role
 
 var db = require("../database/sqlite.database");
 var conn = require("../database/main.database");
@@ -17,8 +18,8 @@ const activeVal =  "66048";
 module.exports.getAuthLDAPPage = (req,res)=>{
     if(req.signedCookies.auth_token){
         var token = req.signedCookies.auth_token;
-        var userId = decode(token,privateKey).userId;
-        var role = decode(token,privateKey).roleId;
+        var userId = func_lib.decode(token,privateKey).userId;
+        var role = func_lib.decode(token,privateKey).roleId;
         db.all("SELECT * FROM `cookies` WHERE cookie = ? AND userId = ?",[token,userId],(err,rs)=>{
             if(err) throw err;
             if(rs.length>0){
@@ -28,8 +29,8 @@ module.exports.getAuthLDAPPage = (req,res)=>{
                     if(err)throw err;
                     if(rs.length>0){
                         var username = rs[0][0].accountName;
-                        var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
-                        conn.query(sql,[role],(err,rs)=>{
+                        var sql = "CALL Proc_SelectPermissionByUserRoleName(?,?)";
+                        conn.query(sql,[role,functionId],(err,rs)=>{
                             if(err)throw err;
                             rs = rs[0];
                             var checkPer = [];
@@ -238,7 +239,7 @@ module.exports.syncDataToDatabase = (req,res)=>{
                     let fullname = userList_filtered[i].fullname;
                     let des = userList_filtered[i].description;
                     let status = userList_filtered[i].status;
-                    if(status == "inactive"){var inactive = 1;}
+                    if(status == "inactive"){var inactive = 1;}else{var inactive = 0;}
                     (function(name,isLocal,fullname,des,inactive){
                         conn.query("SELECT `objectSid` FROM `user` WHERE `objectSid` = ?",[sid],(err,rs)=>{
                             if(err) throw err;
@@ -259,12 +260,6 @@ module.exports.syncDataToDatabase = (req,res)=>{
         }else{
             res.send("Please Create Connection First");
         } 
-    });
-};
-function decode(token,key){
-    return  jwt.verify(token,key,(err,decoded)=>{
-        if(err) throw err;
-        return decoded.data;
     });
 };
 function get_connection_from_LDAP(callback){

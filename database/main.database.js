@@ -8,4 +8,8 @@ var conn = mysql.createConnection({
     database: process.env.DB
 });
 
+// conn.query("TRUNCATE TABLE `object`",(err)=>{if(err) throw err;})
+// conn.query("TRUNCATE TABLE `city`",(err)=>{if(err) throw err;})
+// conn.query("TRUNCATE TABLE `district`",(err)=>{if(err) throw err;})
+// conn.query("TRUNCATE TABLE `location`",(err)=>{if(err) throw err;})
 module.exports = conn;

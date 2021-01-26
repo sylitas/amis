@@ -11418,3 +11418,16 @@ ul, #myUL {
   background: url('//upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Phi_fenomeni.gif/50px-Phi_fenomeni.gif') 
               50% 50% no-repeat rgb(249,249,249);
 }
+
+.paginate_button:active {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+.paginate_button:hover {
+  border: 1px solid transparent !important;
+  background: transparent !important;
+}
+div.dataTables_wrapper div.dataTables_length select {
+  width: 60px !important;
+}

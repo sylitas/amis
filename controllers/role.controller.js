@@ -5,6 +5,7 @@ var db = require("../database/sqlite.database");
 
 
 var privateKey = process.env.KEY;
+const functionId = 1; // /management/role
 
 module.exports.getRole = (req,res)=>{
     if(req.signedCookies.auth_token){
@@ -20,8 +21,8 @@ module.exports.getRole = (req,res)=>{
                     if(err)throw err;
                     if(rs.length>0){
                         var username = rs[0][0].accountName;
-                        var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
-                        conn.query(sql,[role],(err,rs)=>{
+                        var sql = "CALL Proc_SelectPermissionByUserRoleName(?,?)";
+                        conn.query(sql,[role,functionId],(err,rs)=>{
                             if(err)throw err;
                             rs = rs[0];
                             var checkPer = [];
@@ -127,8 +128,8 @@ module.exports.postUserInRole = (req,res)=>{
 module.exports.postAddNewRole = (req,res)=>{
     var token = req.signedCookies.auth_token;
     var role = func_lib.decode(token,privateKey).roleId;
-    var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
-    conn.query(sql,[role],(err,rs)=>{
+    var sql = "CALL Proc_SelectPermissionByUserRoleName(?,?)";
+    conn.query(sql,[role,functionId],(err,rs)=>{
         if(err)throw err;
         rs = rs[0];
         var checkPer = [];
@@ -169,8 +170,8 @@ module.exports.postAddNewRole = (req,res)=>{
 module.exports.postDeleteRole = (req,res)=>{
     var token = req.signedCookies.auth_token;
     var role = func_lib.decode(token,privateKey).roleId;
-    var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
-    conn.query(sql,[role],(err,rs)=>{
+    var sql = "CALL Proc_SelectPermissionByUserRoleName(?,?)";
+    conn.query(sql,[role,functionId],(err,rs)=>{
         if(err)throw err;
         rs = rs[0];
         var checkPer = [];
@@ -223,8 +224,8 @@ module.exports.takeValueForEditRole = (req,res)=>{
 module.exports.postEditRole = (req,res)=>{
     var token = req.signedCookies.auth_token;
     var role = func_lib.decode(token,privateKey).roleId;
-    var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
-    conn.query(sql,[role],(err,rs)=>{
+    var sql = "CALL Proc_SelectPermissionByUserRoleName(?,?)";
+    conn.query(sql,[role,functionId],(err,rs)=>{
         if(err)throw err;
         rs = rs[0];
         var checkPer = [];
@@ -345,7 +346,7 @@ module.exports.postDeleteUserInRole = (req,res)=>{
 //grant permission
 module.exports.postActionData = (req,res)=>{
     //database
-    // conn.query("TRUNCATE TABLE permission",(err)=>{if(err)throw err;});
+    //conn.query("TRUNCATE TABLE permission",(err)=>{if(err)throw err;});
     // conn.query("SELECT * FROM `functionAction`",(err,rs)=>{
     //     if(err)throw err;
     //     var fid_ls = [];
@@ -364,7 +365,8 @@ module.exports.postActionData = (req,res)=>{
     //         var aId = aid_ls[i];
     //         var urId = urid_ls[i];
     //         (function(fId,aId,urId){
-    //             conn.query( "INSERT INTO `permission`(functionId,actionId,userRoleId,isPermission) VALUES(?,?,?,?)",[fId,aId,urId,0],(err,rs)=>{
+    //             if(urId == 1){var isPermission = 1;}else{var isPermission = 0;}
+    //             conn.query( "INSERT INTO `permission`(functionId,actionId,userRoleId,isPermission) VALUES(?,?,?,?)",[fId,aId,urId,isPermission],(err,rs)=>{
     //                 if(err)throw err;
     //             });
     //         })(fId,aId,urId);
@@ -444,8 +446,8 @@ module.exports.postActionData = (req,res)=>{
 module.exports.postFuction = (req,res)=>{
     var token = req.signedCookies.auth_token;
     var role = func_lib.decode(token,privateKey).roleId;
-    var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
-    conn.query(sql,[role],(err,rs)=>{
+    var sql = "CALL Proc_SelectPermissionByUserRoleName(?,?)";
+    conn.query(sql,[role,functionId],(err,rs)=>{
         if(err)throw err;
         rs = rs[0];
         var checkPer = [];
@@ -480,8 +482,8 @@ module.exports.postFuction = (req,res)=>{
 module.exports.postDataForPermission = (req,res)=>{
     var token = req.signedCookies.auth_token;
     var role = func_lib.decode(token,privateKey).roleId;
-    var sql = "CALL Proc_SelectPermissionByUserRoleName(?)";
-    conn.query(sql,[role],(err,rs)=>{
+    var sql = "CALL Proc_SelectPermissionByUserRoleName(?,?)";
+    conn.query(sql,[role,functionId],(err,rs)=>{
         if(err)throw err;
         rs = rs[0];
         var checkPer = [];

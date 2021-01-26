@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    $("#page-top").addClass("sidebar-toggled");
+    $("#accordionSidebar").addClass("toggled");
     var id;
     var tableRole = $('#dataTable-Role').DataTable({
         "scrollY":"35vh",

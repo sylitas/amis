@@ -1,11 +1,14 @@
 $(document).ready(function() {
+    $("#page-top").addClass("sidebar-toggled");
+    $("#accordionSidebar").addClass("toggled");
     var id;
     var tableRole = $('#dataTable-Role').DataTable({
-        "scrollY":"70vh",
-        "scrollX":true,
-        "paging":   false,
+        "scrollY":"60vh",
+        // "scrollX":true,
+        "paging":   true,
+        "lengthMenu": [ 25, 50 , 100 , 150 ],
         "ordering": false,
-        "info":     false,
+        "info":     true,
         "filter": true,
         "processing": true,
         "serverSide": true,
@@ -71,14 +74,14 @@ $(document).ready(function() {
     $("#submitAddingRole").click(function(e){
         e.preventDefault();
         var data = $("#addingRole").serializeArray();
+        if(!data[0].value){
+            alert("Invalid Code");
+            return;
+        }
         if($('select[name=calc_shipping_provinces] option:selected').text() != "City"){
-            data[14].value = $('select[name=calc_shipping_provinces] option:selected').text();
+            data[14].value = $('select[name=calc_shipping_provinces] option:selected').val();
         }else{
             data[14].value = '';
-        }
-        if(!data[14].value){
-            alert("Please Choose The Location");
-            return;
         }
         if(!data[2].value){
             alert('Missing Fill "Name"');

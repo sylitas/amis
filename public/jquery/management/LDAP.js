@@ -1,4 +1,6 @@
 $(document).ready(function() {
+    $("#page-top").addClass("sidebar-toggled");
+    $("#accordionSidebar").addClass("toggled");
     var tableRole;
     if($("input[name=ip]").val()){
         $("#status").css("color","green");
@@ -52,7 +54,7 @@ $(document).ready(function() {
     });
     $("#cl_LDAPuser").click(function () {
         tableRole = $('#dataTable-LDAPuser').DataTable({
-            "scrollY":"60vh",
+            "scrollY":"52vh",
             "paging":   false,
             "ordering": false,
             "info":     true,

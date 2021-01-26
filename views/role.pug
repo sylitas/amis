@@ -25,43 +25,7 @@ body#page-top
   // Page Wrapper
   #wrapper
     // Sidebar
-    ul#accordionSidebar.navbar-nav.bg-gradient-primary.sidebar.sidebar-dark.accordion
-      // Sidebar - Brand
-      a.sidebar-brand.d-flex.align-items-center.justify-content-center(href='/dashboard')
-        .sidebar-brand-icon.rotate-n-15
-          i.fas.fa-laugh-wink
-        .sidebar-brand-text.mx-3
-          | SB Admin 
-          sup 2
-      // Divider
-      hr.sidebar-divider.my-0
-      // Nav Item - Dashboard
-      li.nav-item
-        a.nav-link(href='index.html')
-          i.fas.fa-fw.fa-tachometer-alt
-          span Dashboard
-      // Divider
-      hr.sidebar-divider
-      // Heading
-      .sidebar-heading
-        | Grant Permission
-      // Nav Item - Pages Collapse Menu
-      li.nav-item.active
-        a.nav-link(href='#')
-          i.fas.fa-fw.fa-cog
-          span Role
-      // Divider
-      hr.sidebar-divider
-      // Nav Item - Pages Collapse Menu
-      li.nav-item
-        a.nav-link.collapsed(href='/management/LDAP')
-          i.fas.fa-fw.fa-folder
-          span LDAP
-      // Divider
-      hr.sidebar-divider.d-none.d-md-block
-      // Sidebar Toggler (Sidebar)
-      .text-center.d-none.d-md-inline
-        button#sidebarToggle.rounded-circle.border-0
+    include sidebar_1.pug
     // End of Sidebar
     // Content Wrapper
     #content-wrapper.d-flex.flex-column
