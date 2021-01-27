@@ -20,7 +20,7 @@ $(document).ready(function() {
             {"data": "note"}
         ],
         "createdRow":function(row,data,dataIndex,cells){
-            if(data.id == 1){
+            if(dataIndex == 0){
                 $(row).addClass( 'table-primary' );
             }
         },

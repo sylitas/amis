@@ -3,7 +3,7 @@ $(document).ready(function() {
     $("#accordionSidebar").addClass("toggled");
     var id;
     var tableRole = $('#dataTable-Role').DataTable({
-        "scrollY":"60vh",
+        "scrollY":"58vh",
         // "scrollX":true,
         "paging":   true,
         "lengthMenu": [ 25, 50 , 100 , 150 ],
@@ -26,8 +26,9 @@ $(document).ready(function() {
             {"data": "bc"}
         ],
         "createdRow":function(row,data,dataIndex,cells){
-            if(data.id == 1){
+            if(dataIndex == 0){
                 $(row).addClass( 'table-primary' );
+                id = data.id;
             }
         },
         "rowId": function(a) {

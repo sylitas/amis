@@ -47,7 +47,14 @@ head
     #cancelEditingRole{
       margin-right:10px;
     }
-    
+    table{
+      margin: 0 auto;
+      width: 100%;
+      clear: both;
+      border-collapse: collapse;
+      table-layout: fixed; // ***********add this
+      word-wrap:break-word; // ***********and this
+    }
 body#page-top
   // Page Wrapper
   #wrapper
@@ -295,12 +302,12 @@ body#page-top
                   thead
                     tr
                       th(width='10%') Name
-                      th(width='5%') Phone
-                      th(width='10%') Email
-                      th(width='30%') Address
-                      th(width='5%') Tax
+                      th(width='10%') Phone
+                      th(width='15%') Email
+                      th(width='10%') Address
+                      th(width='10%') Tax
                       th(width='10%') Type of Client
-                      th(width='30%') Budget Code
+                      th(width='25%') Budget Code
   .invisible_div
     p#check_use=use
     p#check_add=add
