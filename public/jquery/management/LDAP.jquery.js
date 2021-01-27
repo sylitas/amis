@@ -34,7 +34,7 @@ $(document).ready(function() {
         }
         $.ajax({
             type: "POST",
-            url: "http://localhost:1999/management/LDAP/postAuthLDAPPage",
+            url: "http://localhost:1999/management/user/ldap/postAuthLDAPPage",
             data: {
                 "ip":ip,
                 "baseDN":baseDN,
@@ -63,7 +63,7 @@ $(document).ready(function() {
             "serverSide": true,
             "ajax": {
                 "type": "POST",
-                "url":"http://localhost:1999/management/LDAP/postDataForLDAPuser"
+                "url":"http://localhost:1999/management/user/ldap/postDataForLDAPuser"
             },
             "columns": [
                 {"data": "name"}, 
@@ -99,7 +99,7 @@ $(document).ready(function() {
         $("#syncTxt").text("Syncing...");
         $.ajax({
             type: "POST",
-            url: "http://localhost:1999/management/LDAP/syncDataToDatabase"
+            url: "http://localhost:1999/management/user/ldap/syncDataToDatabase"
         }).done(function(rs){
             if(rs == "Done"){
                 setTimeout(function(){

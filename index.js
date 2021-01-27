@@ -35,6 +35,7 @@ const contactRouter = require("./models/routers/contact.router");
 const testRouter = require("./models/routers/test.router");
 const clientRouter = require("./models/routers/client.router");
 const LDAPRouter = require("./models/routers/LDAP.router");
+const localRouter = require("./models/routers/local.router");
 
 var app = express();
 var port = process.env.PORT || 1999;
@@ -58,7 +59,9 @@ app.use('/dashboard',dashboardRouter);
 // Management is a site that contain everything with manage. Role API is one of them 
 app.use('/management/role',roleRouter);
 // for LDAP
-app.use('/management/LDAP',LDAPRouter);
+app.use('/management/user/ldap',LDAPRouter);
+//for local
+app.use('/management/user/local',localRouter);
 //'/contact -->contact.router.js------>contact.controller.js
 // Contact contain all the information of personal client and company client
 app.use('/contact',contactRouter);

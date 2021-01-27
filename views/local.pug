@@ -1,0 +1,97 @@
+doctype html
+head
+  meta(charset='utf-8')
+  meta(http-equiv='X-UA-Compatible' content='IE=edge')
+  meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+  meta(name='description' content='')
+  meta(name='author' content='')
+  title User/Local
+  // Custom fonts for this template
+  script(src='http://localhost:1999/dashboard/vendor/jquery/jquery.min.js')
+  link(href='http://localhost:1999/dashboard/vendor/fontawesome-free/css/all.min.css' rel='stylesheet' type='text/css')
+  link(href='https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i' rel='stylesheet')
+  // Custom styles for this template
+  link(href='http://localhost:1999/dashboard/css/sb-admin-2-management.css' rel='stylesheet')
+  // Custom styles for this page
+  link(href='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.css' rel='stylesheet')
+  link(href='https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css' rel='stylesheet' type='text/css')
+  // Page level plugins
+  script(src='http://localhost:1999/dashboard/vendor/datatables/jquery.dataTables.min.js')
+  script(src='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.js')
+  link(type='text/css' href='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css' rel='stylesheet')
+  script(type='text/javascript' src='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js')
+  script(src='http://localhost:1999/jquery/management/local.jquery.js')
+  style(type='text/css').
+    .card{
+      background-color:transparent !important;
+    }
+    .dataTables_wrapper div.dataTables_length select{
+      width:60px !important;
+    }
+    table.dataTable>thead .sorting:before, table.dataTable>thead .sorting_asc:before, table.dataTable>thead .sorting_desc:before, table.dataTable>thead .sorting_asc_disabled:before, table.dataTable>thead .sorting_desc_disabled:before {
+      content: none !important;
+    }
+    table.dataTable>thead .sorting:after, table.dataTable>thead .sorting_asc:after, table.dataTable>thead .sorting_desc:after, table.dataTable>thead .sorting_asc_disabled:after, table.dataTable>thead .sorting_desc_disabled:after {
+      content: none !important;
+    }
+body#page-top
+  // Page Wrapper
+  #wrapper
+    // Sidebar
+    include sidebar.component.pug
+    // End of Sidebar
+    // Content Wrapper
+    #content-wrapper.d-flex.flex-column
+      // Main Content
+      #content
+        //Topbar
+        include topbar.component.pug
+        // End of Topbar
+        // Begin Page Content
+        .container-fluid
+          .card
+            .card-header
+              .row
+                .col-6
+                  h4.m-0.font-weight-bold.text-primary Local Users
+            .card-footer
+            .card-body
+              .table-responsive
+                table#userLocal.table.table-bordered.nowrap.hover.row-border.order-column.compact.cell-border(width='100%' cellspacing='0')
+                  thead
+                    tr
+                      th(width='20%') Username
+                      th(width='20%') Full name
+                      th(width='20%') Email
+                      th(width='30%') Description
+                      th(width='10%') Status
+
+  .invisible_div
+    p#check_use=use
+    p#check_add=add
+    p#check_edit=edit
+    p#check_del=del
+    p#check_export=exp
+  //modal for create a new role
+  // End of Page Wrapper
+  // Scroll to Top Button
+  a.scroll-to-top.rounded(href='#page-top')
+    i.fas.fa-angle-up
+  // Logout Modal
+  #logoutModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          h5#exampleModalLabel.modal-title Ready to Leave?
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+        .modal-body Select &quot;Logout&quot; below if you are ready to end your current session.
+        .modal-footer
+          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          a.btn.btn-primary(href='/logout') Logout
+  // Bootstrap core JavaScript
+  script(src='http://localhost:1999/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js')
+  // Core plugin JavaScript
+  script(src='http://localhost:1999/dashboard/vendor/jquery-easing/jquery.easing.min.js')
+  // Custom scripts for all pages
+  script(src='http://localhost:1999/dashboard/js/sb-admin-2.min.js')

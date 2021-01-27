@@ -32,7 +32,7 @@ module.exports.getRole = (req,res)=>{
                                 }
                                 var data = func_lib.func_noPer(checkPer);
                                 res.render("role",{
-                                    "username":username,
+                                    "accountName":username,
                                     "use":data.use,
                                     "add":data.add,
                                     "edit":data.edit,
@@ -41,7 +41,7 @@ module.exports.getRole = (req,res)=>{
                                 });
                             }else{
                                 res.render("role",{
-                                    "username":username
+                                    "accountName":username
                                 });
                             }
                         });

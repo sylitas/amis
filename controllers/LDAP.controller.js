@@ -218,9 +218,9 @@ module.exports.syncDataToDatabase = (req,res)=>{
                         var email = rs[i].mail;
                         var des = rs[i].description;
                         if(rs[i].userAccountControl == activeVal){var status = "active";}else{var status = "inactive"}
-                        if(!name){name = "";};
-                        if(!email){email="";}
-                        if(!des){des = "";}
+                        if(!name){name = null;};
+                        if(!email){email=null;}
+                        if(!des){des = null;}
                         var data = {
                             sid:sid,
                             name:name,

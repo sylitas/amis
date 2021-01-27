@@ -162,10 +162,6 @@ $(document).ready(function() {
         }else{
             data[14].value = '';
         }
-        if(!data[14].value){
-            alert("Please Choose The Location");
-            return;
-        }
         if(!data[2].value){
             alert('Missing Fill "Name"');
         }else{
