@@ -114,7 +114,65 @@ module.exports.postAuthLDAPPage = (req,res)=>{
     var ad = new ActiveDirectory(config);
     ad.authenticate(username, password, function(err, auth) {
         if(auth){
-            res.send(true);
+            var userList_filtered = [];
+            var ad = new ActiveDirectory({
+                url     : url,
+                baseDN  : baseDN,
+                username: username,
+                password: password,
+                attributes: {
+                    user: [ 'objectSid', 'sAMAccountName', 'mail', 'displayName' , 'description' , 'userAccountControl' ]
+                },
+                entryParser : customEntryParser
+            });
+            ad.findUsers('cn=*', function(err, rs) {
+                for(var i=0;i<rs.length;){
+                    var fullname =  rs[i].displayName;
+                    if(!fullname){i++;}else{
+                        var sid = JSON.stringify(rs[i].objectSid);
+                        var name = rs[i].sAMAccountName;
+                        var email = rs[i].mail;
+                        var des = rs[i].description;
+                        if(rs[i].userAccountControl == activeVal){var status = "active";}else{var status = "inactive"}
+                        if(!name){name = null;};
+                        if(!email){email=null;}
+                        if(!des){des = null;}
+                        var data = {
+                            sid:sid,
+                            name:name,
+                            fullname:fullname,
+                            email:email,
+                            description:des,
+                            status:status
+                        }
+                        userList_filtered.push(data);
+                        i++;
+                    }
+                }
+                for(let i=0;i<userList_filtered.length;i++){
+                    let sid = userList_filtered[i].sid;
+                    let name = userList_filtered[i].name;
+                    let fullname = userList_filtered[i].fullname;
+                    let des = userList_filtered[i].description;
+                    let status = userList_filtered[i].status;
+                    if(status == "inactive"){var inactive = 1;}else{var inactive = 0;}
+                    (function(name,isLocal,fullname,des,inactive){
+                        conn.query("SELECT `objectSid` FROM `user` WHERE `objectSid` = ?",[sid],(err,rs)=>{
+                            if(err) throw err;
+                            if(rs.length>0){
+                                conn.query( "UPDATE `user` SET accountName = ?, isLocal = ?, fullName = ?, userNote = ?, inactive = ? WHERE objectSid = ?",[name,isLocal,fullname,des,inactive,sid],(err)=>{
+                                    if(err)throw err;
+                                });
+                            }else{
+                                conn.query( "INSERT INTO `user`(accountName,objectSid,isLocal,fullName,userNote,inactive) VALUES (?,?,?,?,?,?)",[name,sid,isLocal,fullname,des,inactive],(err)=>{
+                                    if(err)throw err;
+                                });
+                            }
+                        });
+                    })(name,isLocal,fullname,des,inactive);
+                }
+                res.send(true);
+            });
         }else{
             res.send(false);
         }
@@ -122,76 +180,61 @@ module.exports.postAuthLDAPPage = (req,res)=>{
 };
 //data for LDAPuser
 module.exports.postDataForLDAPuser = (req,res)=>{
-    get_connection_from_LDAP((config)=>{
-        if(config){
-            var userList_filtered = [];
-            var draw = req.body.draw;
-            var recordsTotal; 
-            var recordsFiltered;
-            var searchStr = req.body.search.value;
+    var dataList = [];
+    var draw = req.body.draw;
+    var length = req.body.length;
+    var start = req.body.start;
+    var recordsTotal; 
+    var recordsFiltered;
+    var searchStr = req.body.search.value;
+    conn.query("SELECT * FROM `user` WHERE isLocal = 2",(err,rs)=>{
+        if(err) throw err;
+        recordsTotal = rs.length;
+        recordsFiltered = rs.length;
+        conn.query('SELECT * FROM `user` WHERE isLocal = 2 AND `fullName` LIKE "%'+searchStr+'%" LIMIT '+length+' OFFSET '+start,(err,rs)=>{
+            if(err) throw err; 
             if(searchStr){
-                var query = 'cn=*'+searchStr+'*'
-            }else{
-                var query = 'cn=*'
-            }
-            var ad = new ActiveDirectory(config);
-            ad.findUsers('cn=*', function(err, rs) {
-                recordsTotal = rs.length;
                 recordsFiltered = rs.length;
-                ad.findUsers(query, function(err, rs) {
-                    if(rs !== undefined){
-                        if(searchStr){
-                            recordsFiltered = rs.length;
-                        }
-                        for(var i=0;i<rs.length;){
-                            var fullname =  rs[i].displayName;
-                            if(!fullname){i++;}else{
-                                var name = rs[i].sAMAccountName;
-                                var email = rs[i].mail;
-                                var des = rs[i].description;
-                                if(rs[i].userAccountControl == activeVal){var status = "active";}else{var status = "inactive"}
-                                if(!name){name = "";};
-                                if(!email){email="";}
-                                if(!des){des = "";}
-                                var data = {
-                                    name:name,
-                                    fullname:fullname,
-                                    email:email,
-                                    description:des,
-                                    status:status
-                                }
-                                userList_filtered.push(data);
-                                i++;
-                            }
-                        }
-                        //sort this array alphabetically
-                        userList_filtered.sort(function(a, b) {
-                            var textA = a.name.toUpperCase();
-                            var textB = b.name.toUpperCase();
-                            return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;
-                        });
-                    }else{
-                        userList_filtered = [];
-                    }
-                    var userList_filtered_Send = {
-                        "draw":draw,
-                        "recordsTotal":recordsTotal,
-                        "recordsFiltered":recordsFiltered,
-                        "data":userList_filtered
-                    }
-                    res.send(userList_filtered_Send);
-                });
-            });
-        }else{
-            userList_filtered = [];
-            var userList_filtered_Send = {
-                "draw":draw,
-                "recordsTotal":0,
-                "recordsFiltered":0,
-                "data":userList_filtered
             }
-            res.send(userList_filtered_Send);
-        } 
+            if(rs.length>0){
+                for(let i=0;i<rs.length;i++){
+                    var name = rs[i].accountName;
+                    var fullname = rs[i].fullName;
+                    var email = rs[i].email;
+                    var des = rs[i].userNote;
+                    var status = rs[i].inactive;
+                    if(!name){name = null;}
+                    if(!fullname){fullname = null;}
+                    if(!email){email = null;}
+                    if(!des){des = null;}
+                    if(status == 0){status = "active";}else{status = "inactive";}
+                    var data = {
+                        name:name,
+                        fullname:fullname,
+                        email:email,
+                        description:des,
+                        status:status
+                    }
+                    dataList.push(data);
+                }
+                var dataSend = {
+                    "data":dataList,
+                    "draw":draw,
+                    "recordsTotal":recordsTotal,
+                    "recordsFiltered":recordsFiltered
+                }
+                res.send(dataSend);
+            }else{
+                dataList = [];
+                var dataSend = {
+                    "data":dataList,
+                    "draw":draw,
+                    "recordsTotal":recordsTotal,
+                    "recordsFiltered":recordsFiltered
+                }
+                res.send(dataSend);
+            }
+        });
     });
 };
 //sync clicked

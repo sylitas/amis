@@ -1,0 +1,265 @@
+doctype html
+head
+  meta(charset='utf-8')
+  meta(http-equiv='X-UA-Compatible' content='IE=edge')
+  meta(name='viewport' content='width=device-width, initial-scale=1, shrink-to-fit=no')
+  meta(name='description' content='')
+  meta(name='author' content='')
+  title User/Local
+  // Custom fonts for this template
+  script(src='http://localhost:1999/dashboard/vendor/jquery/jquery.min.js')
+  link(href='http://localhost:1999/dashboard/vendor/fontawesome-free/css/all.min.css' rel='stylesheet' type='text/css')
+  link(href='https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i' rel='stylesheet')
+  // Custom styles for this template
+  link(href='http://localhost:1999/dashboard/css/sb-admin-2-CRUD.css' rel='stylesheet')
+  // Custom styles for this page
+  link(href='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.css' rel='stylesheet')
+  link(href='https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css' rel='stylesheet' type='text/css')
+  // Page level plugins
+  script(src='http://localhost:1999/dashboard/vendor/datatables/jquery.dataTables.min.js')
+  script(src='http://localhost:1999/dashboard/vendor/datatables/dataTables.bootstrap4.min.js')
+  link(type='text/css' href='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css' rel='stylesheet')
+  script(type='text/javascript' src='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js')
+  script(src='http://localhost:1999/jquery/management/local.jquery.js')
+  style(type='text/css').
+    .floatLeft{
+      padding-top:10px;
+      float:right;
+    }
+    .col-2{
+      text-align:right;
+    }
+    select{
+      background-color:#FFFFFF;
+      padding: 1px 2px;
+    }
+    h5{
+      border-bottom: 1px solid black !important;
+    }
+    .marginhere{
+      margin-bottom:25px;
+    }
+body#page-top
+  // Page Wrapper
+  #wrapper
+    // Sidebar
+    include sidebar.component.pug
+    // End of Sidebar
+    // Content Wrapper
+    #content-wrapper.d-flex.flex-column
+      // Main Content
+      #content
+        //Topbar
+        include topbar.component.pug
+        // End of Topbar
+        // Begin Page Content
+        .container-fluid
+          .card
+            .card-header
+              .row
+                .col-6
+                  h4 Adding Customer
+                .col-6  
+                  .floatLeft
+                    a.btn.btn-secondary(href="/contact") Cancel
+                    button.btn.btn-primary() Save
+            .card-footer
+            .card-body
+              form#addingRole(autocomplete="off")
+                .row
+                  .col-12.text-center
+                    p Please complete all input had "(<b style="color:red">*</b>)"
+                .row
+                  .col-1
+                  .col-10.marginhere
+                    h5 General Customer Information
+                .row
+                  .col-1
+                  .col-2
+                    p Code (<b style="color:red">*</b>):
+                  .col-3
+                    .input-group
+                      input(name="cc" type="text" style={width:"100%"} placeholder="Customer Code" autocomplete="off")
+                  .col-2
+                    p List :
+                  .col-3
+                    .input-group
+                      input(name="cl" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
+                .row
+                  .col-1
+                  .col-2
+                    p Name (<b style="color:red">*</b>) :
+                  .col-3
+                    .input-group
+                      input(name="name" type="text" style={width:"100%"} placeholder="Name" autocomplete="off")
+                  .col-2
+                    p Group :
+                  .col-3
+                    .input-group
+                      input(name="cg" type="text" style={width:"100%"} placeholder="#" autocomplete="off")
+                .row
+                  .col-1
+                  .col-2
+                    p Type (<b style="color:red">*</b>) :
+                  .col-3
+                    .input-group
+                      select(name="toc" style={width:"100%"})
+                        option(value="1") Personal Customer
+                        option(value="2") Company Customer
+                  .col-2
+                    p BIC :
+                  .col-3
+                    .input-group
+                      input(name="sc" type="text" style={width:"100%"} placeholder="Swift Code" autocomplete="off")
+                .row
+                  .col-1
+                  .col-2
+                    p Born Date :
+                  .col-3
+                    .input-group
+                      input(name="dob" type="date" style={width:"100%"} placeholder="Date" autocomplete="off")
+                  .col-2
+                  .col-3
+                .row
+                  .col-1
+                  .col-10.marginhere  
+                    h5 Identify Card
+                .row
+                  .col-1
+                  .col-2
+                    p Number :
+                  .col-3
+                    .input-group
+                      input(name="numberId" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
+                  .col-2
+                    p Date :
+                  .col-3
+                    .input-group
+                      input(name="dateId" type="date" style={width:"100%"} placeholder="Date Begining" autocomplete="off")
+                .row
+                  .col-1
+                  .col-2
+                    p Place :
+                  .col-3
+                    .input-group
+                      input(name="place" type="text" style={width:"100%"} placeholder="Place Receiving" autocomplete="off")
+                .row
+                  .col-1
+                  .col-10.marginhere  
+                    h5 Contact
+                .row
+                  .col-1
+                  .col-2
+                    p Phone :
+                  .col-3
+                    .input-group
+                      input(name="phone" type="text" style={width:"100%"} placeholder="Phone Number" autocomplete="off" maxlength="10")
+                  .col-2
+                    p Fax :
+                  .col-3
+                    .input-group
+                      input(name="fax" type="text" style={width:"100%"} placeholder="Fax" autocomplete="off")
+                .row
+                  .col-1
+                  .col-2
+                    p Postal Code :
+                  .col-3
+                    .input-group
+                      input(name="pc" type="text" style={width:"100%"} placeholder="Postal Code" autocomplete="off")
+                  .col-2
+                    p Email :
+                  .col-3
+                    .input-group
+                      input(name="email" type="text" style={width:"100%"} placeholder="name@example.com" autocomplete="off")
+                .row
+                  .col-1
+                  .col-10.marginhere  
+                    h5 Location
+                .row
+                  .col-1
+                  .col-2
+                    p City :
+                  .col-3
+                    .input-group
+                      select(name='calc_shipping_provinces' required='' style={width:"100%"})
+                        option(value='') City
+                  .col-2
+                    p Address:
+                  .col-3
+                    .input-group
+                      input(name="address" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
+                .row
+                  .col-1
+                  .col-2
+                    p District :
+                  .col-3
+                    .input-group
+                      select(name='calc_shipping_district' required='' style={width:"100%"})
+                        option(value='') District
+                  .col-2
+                    p Trade Place:
+                  .col-3
+                    .input-group
+                      input(name="tp" type="text" style={width:"100%"} placeholder="Street , house's number" autocomplete="off")
+                .row
+                  .col-1
+                  .col-10.marginhere
+                    h5 Taxation & Bank Account
+                .row
+                  .col-1
+                  .col-2
+                    p Tax :
+                  .col-3
+                    .input-group
+                      input(name="tax" type="text" style={width:"100%"} placeholder="Tax" autocomplete="off" maxlength="11")
+                  .col-2
+                    p Bank Number :
+                  .col-3
+                    .input-group
+                      input(name="bankNumber" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
+                .row
+                  .col-1
+                  .col-2
+                    p Budget Code :
+                  .col-3
+                    .input-group
+                      input(name="bc" type="text" style={width:"100%"} placeholder="Budget Code" autocomplete="off")
+                  .col-2
+                    p Branch :
+                  .col-3
+                    .input-group
+                      input(name="branch" type="text" style={width:"100%"} placeholder="Place" autocomplete="off")
+
+
+
+    
+
+  .invisible_div
+    p#check_use=use
+    p#check_add=add
+    p#check_edit=edit
+    p#check_del=del
+    p#check_export=exp
+  //modal for create a new role
+  // End of Page Wrapper
+  // Scroll to Top Button
+  a.scroll-to-top.rounded(href='#page-top')
+    i.fas.fa-angle-up
+  // Logout Modal
+  #logoutModal.modal.fade(tabindex='-1' role='dialog' aria-labelledby='exampleModalLabel' aria-hidden='true')
+    .modal-dialog(role='document')
+      .modal-content
+        .modal-header
+          h5#exampleModalLabel.modal-title Ready to Leave?
+          button.close(type='button' data-dismiss='modal' aria-label='Close')
+            span(aria-hidden='true') &times;
+        .modal-body Select &quot;Logout&quot; below if you are ready to end your current session.
+        .modal-footer
+          button.btn.btn-secondary(type='button' data-dismiss='modal') Cancel
+          a.btn.btn-primary(href='/logout') Logout
+  // Bootstrap core JavaScript
+  script(src='http://localhost:1999/dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js')
+  // Core plugin JavaScript
+  script(src='http://localhost:1999/dashboard/vendor/jquery-easing/jquery.easing.min.js')
+  // Custom scripts for all pages
+  script(src='http://localhost:1999/dashboard/js/sb-admin-2.min.js')

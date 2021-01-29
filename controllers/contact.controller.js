@@ -6,7 +6,7 @@ var db = require("../database/sqlite.database");
 var privateKey = process.env.KEY;
 var functionId = 2; // /contact
 
-
+//contact PAGE
 module.exports.getContactPage = (req,res)=>{
     if(req.signedCookies.auth_token){
         var token = req.signedCookies.auth_token;
@@ -757,4 +757,9 @@ function check_district(cityId,districtName,callback){
             });
         }
     });
+}
+
+//Create Page
+module.exports.getCreatePage = (req,res)=>{
+    res.render('create_object.function.pug');
 }

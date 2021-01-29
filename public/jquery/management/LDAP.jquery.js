@@ -54,9 +54,10 @@ $(document).ready(function() {
     });
     $("#cl_LDAPuser").click(function () {
         tableRole = $('#dataTable-LDAPuser').DataTable({
-            "scrollY":"52vh",
-            "paging":   false,
-            "ordering": false,
+            "scrollY":"49vh",
+            "paging":   true,
+            "lengthMenu": [ 25, 50 , 100 , 150 ],
+            "ordering": true,
             "info":     true,
             "filter":true,
             "processing": true,

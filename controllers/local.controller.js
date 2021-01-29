@@ -16,9 +16,11 @@ module.exports.postDataForUserLocal = (req,res)=>{
         if(err) throw err;
         recordsTotal = rs.length;
         recordsFiltered = rs.length;
-        conn.query('SELECT * FROM `user` WHERE isLocal = 1 LIKE "%'+searchStr+'%" LIMIT '+length+' OFFSET '+start,(err,rs)=>{
+        conn.query('SELECT * FROM `user` WHERE isLocal = 1 AND `fullName` LIKE "%'+searchStr+'%" LIMIT '+length+' OFFSET '+start,(err,rs)=>{
             if(err) throw err; 
-            recordsFiltered = rs.length;
+            if(searchStr){
+                recordsFiltered = rs.length;
+            }
             if(rs.length>0){
                 for(let i=0;i<rs.length;i++){
                     var name = rs[i].accountName;

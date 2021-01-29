@@ -4,6 +4,7 @@ $(document).ready(function() {
     var userLocal = $('#userLocal').DataTable({
         "scrollY":"60vh",
         "paging":   true,
+        "lengthMenu": [ 25, 50 , 100 , 150 ],
         "ordering": true,
         "info":     true,
         "filter":true,
