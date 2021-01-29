@@ -29,6 +29,7 @@ function get_ad(callback){
                 username: username,
                 password: password
             }
+            console.log(config);
             var ad = new ActiveDirectory(config);
             callback(ad);
         }else{
@@ -89,7 +90,9 @@ module.exports.postAuthenticate = (req,res)=>{
                                 });
                             }else{res.send("Sync first!");}
                         });
-                    }else{res.send("Wrong Username or Password");}
+                    }else{
+                        res.send("Wrong Username or Password");
+                    }
                 });
             })
         }
