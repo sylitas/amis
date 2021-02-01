@@ -1,6 +1,4 @@
 $(document).ready(function() {
-    $("#page-top").addClass("sidebar-toggled");
-    $("#accordionSidebar").addClass("toggled");
     var tableRole;
     if($("input[name=ip]").val()){
         $("#status").css("color","green");

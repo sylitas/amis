@@ -14,4 +14,6 @@ router.post('/postEditData',controller.postEditData);
 
 //create page
 router.get('/create',controller.getCreatePage);
+//edit page
+router.get('/edit',controller.getEditPage);
 module.exports = router;

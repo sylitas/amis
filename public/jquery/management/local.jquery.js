@@ -1,7 +1,5 @@
 $(document).ready(function() {
-    $("#page-top").addClass("sidebar-toggled");
-    $("#accordionSidebar").addClass("toggled");
-    var userLocal = $('#userLocal').DataTable({
+    $('#userLocal').DataTable({
         "scrollY":"60vh",
         "paging":   true,
         "lengthMenu": [ 25, 50 , 100 , 150 ],

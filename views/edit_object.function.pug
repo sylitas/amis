@@ -21,7 +21,7 @@ head
   link(type='text/css' href='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/css/dataTables.checkboxes.css' rel='stylesheet')
   script(type='text/javascript' src='//gyrocode.github.io/jquery-datatables-checkboxes/1.2.12/js/dataTables.checkboxes.min.js')
   script(src='http://localhost:1999/jquery/main.jquery.js')
-  script(src='http://localhost:1999/jquery/contact/create.jquery.js')
+  script(src='http://localhost:1999/jquery/contact/edit.jquery.js')
   style(type='text/css').
     .sticky {
       position: fixed;
@@ -62,11 +62,11 @@ body#page-top
           .row
             .col-1
             .col-5
-              h4 Adding Customer
+              h4 Editing Customer
             .col-4
               .floatLeft
                 a.btn.btn-secondary.mr-3(href="/contact") Cancel
-                button.btn.btn-primary#submitAddingRole Save
+                button.btn.btn-primary#submitEditingRole Save
             .col-2
         // Begin Page Content
         .container-fluid
@@ -74,13 +74,13 @@ body#page-top
             .card-header#header
               .row
                 .col-6
-                  h4 Adding Customer
+                  h4 Editing Customer
                 .col-6  
                   .floatLeft
                     a.btn.btn-secondary.mr-3(href="/contact") Cancel
-                    button.btn.btn-primary(onclick="document.getElementById('submitAddingRole').click()") Save
+                    button.btn.btn-primary(onclick="document.getElementById('submitEditingRole').click()") Save
             .card-body.mt-3
-              form#addingRole(autocomplete="off")
+              form#editForm(autocomplete="off")
                 .GeneralCustomerInformation
                   .row
                     .col-6.marginhere
@@ -220,7 +220,7 @@ body#page-top
                       p Bank Number :
                     .col-2
                       .input-group
-                        input(name="bankNumber" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
+                        input(name="numberBank" type="text" style={width:"100%"} placeholder="Number" autocomplete="off")
                   .row
                     .col-1
                       p Budget Code :

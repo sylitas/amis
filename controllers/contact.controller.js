@@ -51,6 +51,14 @@ module.exports.getContactPage = (req,res)=>{
         });
     }else{res.redirect("/logout");}
 };
+//Create Page
+module.exports.getCreatePage = (req,res)=>{
+    res.render('create_object.function.pug');
+}
+//Edit page
+module.exports.getEditPage = (req,res)=>{
+    res.render('edit_object.function.pug');
+}
 //for main table
 module.exports.postDataForClientTable = (req,res)=>{
     var token = req.signedCookies.auth_token;
@@ -66,7 +74,8 @@ module.exports.postDataForClientTable = (req,res)=>{
         if(err)throw err;
         recordsTotal = rs.length;
         recordsFiltered = rs.length;
-        var sql = 'SELECT * FROM `object` WHERE `userId` = ? AND `objectName` LIKE "%'+searchStr+'%" LIMIT '+length+' OFFSET '+start;
+        //Note: LIKE -> ORDER BY -> LIMIT ->OFFSET
+        var sql = 'SELECT * FROM `object` WHERE `userId` = ? AND `objectName` LIKE "%'+searchStr+'%" ORDER BY `objectId` DESC LIMIT '+length+' OFFSET '+start;
         conn.query(sql,[userId],(err,rs)=>{
             if(err)throw err;
             if(searchStr){
@@ -311,7 +320,7 @@ module.exports.postDataForEdit = (req,res)=>{
                         //--end General data receiving--//
 
                         //--start Identify Card receiving data--//
-                        var numberId = rs[0].objectIDCard_Number;
+                        var numberId = rs[0].objectIdCard_Number;
                         if(rs[0].objectIDCard_Date != null){
                             var dateId = dateFormat(rs[0].objectIDCard_Date,"yyyy-mm-d");
                         }else{
@@ -338,7 +347,7 @@ module.exports.postDataForEdit = (req,res)=>{
                         var tax = rs[0].objectTaxation_Tax;
                         var numberBank = rs[0].objectBank_AccountNumber;
                         var bc = rs[0].objectTaxation_BudgetCode;
-                        var branch = rs[0].objectBank_AccountNumber;
+                        var branch = rs[0].objectBank_Branch;
                         //--end Taxation & Bank Account receiving data--//
                         var validated = func_lib.func_validate_for_edit(
                             [   
@@ -496,8 +505,8 @@ module.exports.postEditData = (req,res)=>{
                 validated[5],validated[6],validated[7],
                 validated[8],validated[9],validated[10],validated[11],
                 validated[13],
-                validated[15],validated[16],
-                validated[17],validated[18],
+                validated[14],validated[15],
+                validated[16],validated[17],
                 objectId
             ],(err)=>{
                 if(err)throw err;
@@ -508,24 +517,27 @@ module.exports.postEditData = (req,res)=>{
                         var districtName = district;
                         if(rs.length >0){
                             cityId_and_districtId_are_mine(cityName,districtName,(cityId,districtId)=>{
-                                conn.query("UPDATE `location` SET `cityId` = ? , `districtId` = ? , `address` = ? WHERE objectId = ?",[cityId,districtId,address],(err,rs)=>{
+                                conn.query("UPDATE `location` SET `cityId` = ? , `districtId` = ? , `address` = ? WHERE objectId = ?",[cityId,districtId,address,objectId],(err,rs)=>{
                                     if(err) throw err;
                                     res.send("Updated!");
                                 });
                             });
                         }else{
                             cityId_and_districtId_are_mine(cityName,districtName,(cityId,districtId)=>{
-                                conn.query("INSERT INTO `location`(objectId,cityId,districtId,address) VALUES(?,?,?)",[objectId,cityId,districtId,address],(err)=>{
+                                conn.query("INSERT INTO `location`(objectId,cityId,districtId,address) VALUES(?,?,?,?)",[objectId,cityId,districtId,address],(err)=>{
                                     if(err) throw err;
                                     res.send("Updated!");
                                 });
                             });
                         }
                     });   
+                }else{
+                    conn.query("UPDATE `location` SET `address` = ? WHERE objectId = ?",[address,objectId],(err)=>{
+                        if(err) throw err;
+                        res.send("Updated!");
+                    });
                 }
-                res.send("Updated!");
             });
-
         }else{
             res.send("Permission Denied!");
         }
@@ -629,14 +641,14 @@ function Create_Location(objectId,city,district,address){
                         conn.query(sql,[district,cityId],(err,rs)=>{
                             if(err) throw err;
                             var districtId = rs[0].districtId;
-                            var sql = "INSERT INTO `location`(objectId,cityId,districtId,address) VALUES(?,?,?)";
+                            var sql = "INSERT INTO `location`(objectId,cityId,districtId,address) VALUES(?,?,?,?)";
                             conn.query(sql,[objectId,cityId,districtId,address],(err)=>{
                                 if(err)throw err;
                             });
                         });
                     });
                 }else{
-                    var sql = "INSERT INTO `location`(objectId,cityId,address) VALUES(?,?)";
+                    var sql = "INSERT INTO `location`(objectId,cityId,address) VALUES(?,?,?)";
                     conn.query(sql,[objectId,cityId,address],(err)=>{
                         if(err)throw err;
                     });
@@ -644,8 +656,8 @@ function Create_Location(objectId,city,district,address){
             });
         });
     }else{
-        var sql = "INSERT INTO `location`(objectId) VALUES(?)";
-        conn.query(sql,[objectId],(err)=>{
+        var sql = "INSERT INTO `location`(objectId,address) VALUES(?,?)";
+        conn.query(sql,[objectId,address],(err)=>{
             if(err)throw err;
         });
     }
@@ -675,7 +687,8 @@ function Get_Location(locationId,callback){
                     });
                 });
             }else{
-                callback(null);
+                var address = rs[0].address;
+                callback(address);
             }
         }else{
             callback(null);
@@ -720,8 +733,9 @@ function cityId_and_districtId_are_mine(cityName,districtName,callback){
                 check_district(cityId,districtName,(districtId)=>{ 
                     callback(cityId,districtId);
                 })
+            }else{
+                callback(cityId,null);
             }
-            callback(cityId,null);
         }else{
             conn.query("INSERT INTO `city`(cityName) VALUES(?)",[cityName],(err)=>{
                 if(err) throw err;
@@ -757,9 +771,4 @@ function check_district(cityId,districtName,callback){
             });
         }
     });
-}
-
-//Create Page
-module.exports.getCreatePage = (req,res)=>{
-    res.render('create_object.function.pug');
 }
