@@ -229,11 +229,14 @@ body#page-top
                   .col-3
                     .input-group
                       input(name="branch" type="text" style={width:"100%"} placeholder="Place" autocomplete="off")
-
-
-
-    
-
+            .card-footer
+              .row
+                .col-6
+                  h4 Adding Customer
+                .col-6  
+                  .floatLeft
+                    a.btn.btn-secondary(href="/contact") Cancel
+                    button.btn.btn-primary() Save
   .invisible_div
     p#check_use=use
     p#check_add=add
