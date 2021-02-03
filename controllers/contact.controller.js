@@ -1,10 +1,11 @@
-var dateFormat = require("dateformat");
+const dateFormat = require("dateformat");
+const excel = require("excel4node");
 
-var func_lib = require("./function.controller");
-var conn = require("../database/main.database");
-var db = require("../database/sqlite.database");
-var privateKey = process.env.KEY;
-var functionId = 2; // /contact
+const func_lib = require("./function.controller");
+const conn = require("../database/main.database");
+const db = require("../database/sqlite.database");
+const privateKey = process.env.KEY;
+const functionId = 2; // /contact
 
 //contact PAGE
 module.exports.getContactPage = (req,res)=>{
@@ -540,6 +541,63 @@ module.exports.postEditData = (req,res)=>{
             });
         }else{
             res.send("Permission Denied!");
+        }
+    });
+};
+//export to Excel
+module.exports.getExport = (req,res)=>{
+    var token = req.signedCookies.auth_token;
+    var userId = func_lib.decode(token,privateKey).userId;
+    var workbook = new excel.Workbook();
+    conn.query("SELECT * FROM `object` WHERE `userId` = ?",[userId],(err,rs)=>{
+        if(err) throw err;
+        var ws = workbook.addWorksheet('Sheet 1');
+        ws.cell(1, 1).string("Code");
+        ws.cell(1, 2).string("Type");
+        ws.cell(1, 3).string("Name");
+        ws.cell(1, 4).string("Birthday");
+        ws.cell(1, 5).string("Swift Code");
+        ws.cell(1, 6).string("IC Number");
+        ws.cell(1, 7).string("ID Date");
+        ws.cell(1, 8).string("ID Place");
+        ws.cell(1, 9).string("Phone");
+        ws.cell(1, 10).string("Fax");
+        ws.cell(1, 11).string("Postal Code");
+        ws.cell(1, 12).string("Email");
+        ws.cell(1, 13).string("TradePlace");
+        ws.cell(1, 14).string("Tax");
+        ws.cell(1, 15).string("Budget Code");
+        ws.cell(1, 16).string("Bank Number");
+        ws.cell(1, 17).string("Branch");
+        if(rs.length>0){
+            for(let i = 0;i < rs.length; i++){
+                var j = i+2;
+                if(rs[i].objectType == 1){
+                    var objectType = "Personal Customer";
+                }else{
+                    var objectType = "Company Customer";
+                }
+                ws.cell(j, 1).string(rs[i].objectCode);
+                ws.cell(j, 2).string(objectType);
+                ws.cell(j, 3).string(rs[i].objectName);
+                ws.cell(j, 4).string(dateFormat(rs[i].objectBirthday,"yyyy-mm-d"));
+                ws.cell(j, 5).string(rs[i].objectSwiftCode);
+                ws.cell(j, 6).string(rs[i].objectIdCard_Number);
+                ws.cell(j, 7).string(dateFormat(rs[i].objectIDCard_Date,"yyyy-mm-d"));
+                ws.cell(j, 8).string(rs[i].objectIDCard_Place);
+                ws.cell(j, 9).string(rs[i].objectContact_Phone);
+                ws.cell(j, 10).string(rs[i].objectContact_Fax);
+                ws.cell(j, 11).string(rs[i].objectContact_PostalCode);
+                ws.cell(j, 12).string(rs[i].objectContact_Email);
+                ws.cell(j, 13).string(rs[i].objectLocation_TradePlace);
+                ws.cell(j, 14).string(rs[i].objectTaxation_Tax);
+                ws.cell(j, 15).string(rs[i].objectTaxation_BudgetCode);
+                ws.cell(j, 16).string(rs[i].objectBank_AccountNumber);
+                ws.cell(j, 17).string(rs[i].objectBank_Branch);
+            }
+            workbook.write('CustomerList.xlsx',res);
+        }else{
+            res.send("No data found");
         }
     });
 };

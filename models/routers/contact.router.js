@@ -11,7 +11,7 @@ router.post('/postDeleteDataFromTableClient',controller.postDeleteDataFromTableC
 router.post('/postAddingClientInformation',controller.postAddingClientInformation);
 router.post('/postDataForEdit',controller.postDataForEdit);
 router.post('/postEditData',controller.postEditData);
-
+router.get('/getExport',controller.getExport);
 //create page
 router.get('/create',controller.getCreatePage);
 //edit page

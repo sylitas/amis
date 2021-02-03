@@ -18,7 +18,7 @@ $(document).ready(function() {
             {"data": "name"}, 
             {"data": "phone"},
             {"data": "email"},
-            {"data":"location"},
+            {"data": "location"},
             {"data": "tax"},
             {"data": "ot"},
             {"data": "bc"}
@@ -71,16 +71,8 @@ $(document).ready(function() {
     $("#edit").click(function(){
         window.location.href = "/contact/edit?id="+id;
     });
-    //cancel when adding customer
-    $("#cancelAddingRole").click(function(){
-        $("form#addingRole :input[type=text]").each(function(){
-            var input = $(this);
-            input.val("");
-        });
-        $("form#addingRole select").each(function(){
-            var input = $(this);
-            input.val(null);
-        });
+    $('#export').click(function(){
+        window.location.href="http://localhost:1999/contact/getExport";
     });
     //key Pressed
     $("html").keyup(function(e){
@@ -107,7 +99,6 @@ $(document).ready(function() {
     $('#grantPermission').prop('disabled', true);
     $('#export').prop('disabled', true);
     //if true set active
-
     if($('p[id=check_use]').text()=="true"){
         $('#grantPermission').prop('disabled', false);
     }
